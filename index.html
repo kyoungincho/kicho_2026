@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대한민국 32강 진출 시나리오 · 2026 월드컵</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="kicker">FIFA World Cup 2026 · 미국 · 캐나다 · 멕시코</p>
+      <h1>대한민국, <span class="accent">32강</span> 진출하려면?</h1>
+      <p class="subtitle">조별리그 결과를 입력하면 진출 가능성을 바로 계산해 드립니다.</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- 규칙 설명 -->
+    <section class="card">
+      <h2>📘 2026 대회 방식 (48개국)</h2>
+      <ul class="rules">
+        <li><strong>48개국</strong>이 <strong>4팀씩 12개 조</strong>(A~L)로 나뉘어 조별리그를 치릅니다.</li>
+        <li>각 조 <strong>1·2위</strong> (총 24개국)는 <strong>32강 자동 진출</strong>.</li>
+        <li>각 조 <strong>3위 12개국 중 성적이 좋은 8개국</strong>이 추가로 32강에 진출.</li>
+        <li>최종 <strong>32개국</strong>이 토너먼트(32강)에 오릅니다.</li>
+      </ul>
+      <div class="verdict-box">
+        <p class="big">대한민국이 32강에 가는 길은 단 두 가지!</p>
+        <div class="paths">
+          <div class="path">
+            <span class="tag tag-green">확실한 길</span>
+            <p>우리 조에서 <strong>1위 또는 2위</strong> 달성 → 무조건 진출</p>
+          </div>
+          <div class="path">
+            <span class="tag tag-amber">희망의 길</span>
+            <p><strong>3위</strong>라도 12개 조 3위 팀 중 <strong>상위 8위 안</strong>에 들면 진출</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 계산기 -->
+    <section class="card">
+      <h2>🧮 우리 조 결과 입력</h2>
+      <p class="hint">4팀의 이름을 적고, 6경기 스코어를 입력하세요. (대한민국은 1번 팀)</p>
+
+      <div class="teams-grid" id="teamsGrid">
+        <label>팀 1 <input type="text" id="team0" value="대한민국" /></label>
+        <label>팀 2 <input type="text" id="team1" value="상대 A" /></label>
+        <label>팀 3 <input type="text" id="team2" value="상대 B" /></label>
+        <label>팀 4 <input type="text" id="team3" value="상대 C" /></label>
+      </div>
+
+      <div class="matches" id="matches"></div>
+
+      <button id="calcBtn" class="primary">결과 계산하기</button>
+
+      <div id="result" class="result hidden"></div>
+    </section>
+
+    <!-- 3위 진출 입력 -->
+    <section class="card" id="thirdSection">
+      <h2>🥉 3위로 끝났다면? (선택)</h2>
+      <p class="hint">
+        다른 조 3위 팀들의 예상 성적(승점 / 골득실 / 득점)을 입력하면,
+        대한민국 3위 성적이 상위 8위 안에 드는지 비교해 드립니다.
+        비워두면 대표 기준치로 자동 비교합니다.
+      </p>
+      <div id="thirdPlaceInputs" class="third-grid"></div>
+      <button id="thirdBtn" class="secondary">3위 경쟁 비교</button>
+      <div id="thirdResult" class="result hidden"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>kicho_2026 · 데이터는 사용자가 입력한 가정값 기반입니다. 실제 대진/규정은 FIFA 공식 발표를 따릅니다.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
