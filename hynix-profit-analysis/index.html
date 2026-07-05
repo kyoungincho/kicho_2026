@@ -93,9 +93,17 @@
   </section>
 
   <section class="panel">
-    <h2>예상 주가 흐름 (선택한 전망까지)</h2>
+    <h2>실제 일봉이 말하는 것 (5~7월)</h2>
+    <div class="why" style="background:#161a12;border-color:#2f3a1e">
+      5월초 <b>160만</b> → 6/22 고점 <b>292만</b> = <b style="color:#ff5b5b">+82% (약 7주)</b> → 7/2 저점 <b>219만</b> = <b style="color:#4f9dff">−25% (2주)</b> → 현재 242만.<br>
+      하루 변동성 <b>±8.2%</b>(연 129%), 최대 하루 <b>−14.6% / +16%</b>. → 이 종목은 <b>몇 주 만에 +80%도, −25%도</b> 갑니다. 전고점까지 +24%는 이 종목엔 짧은 거리라 <b>실적·수급이 받쳐주면 몇 주 내 돌파도 가능</b>. 대신 반대로도 급함.
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>일봉 + 예상 주가 흐름</h2>
     <canvas id="chart" width="660" height="250"></canvas>
-    <p class="tip">빨간선 = 예상 주가 · 노란 점선 = 평단 · 붉은 점선 = 전고점 300만 · 노란 점 = 실적·이벤트</p>
+    <p class="tip">회색선 = 실제 일봉(과거) · 빨간선 = 예상 · 옅은 영역 = 변동 범위(실제 변동성 반영) · 노란 점선 평단 · 붉은 점선 전고점 300만</p>
   </section>
 
   <section class="panel">
@@ -138,6 +146,16 @@ const EVENTS=[
   {d:"2026-12-31",n:"연말·HBM4",j:3},
   {d:"2027-06-30",n:"슈퍼사이클",j:3},
 ];
+// 실제 일봉 종가 (2026, 네이버·인베스팅)
+const HIST=[
+  ["2026-06-04",2298000],["2026-06-05",2070000],["2026-06-08",1911000],["2026-06-09",2215000],
+  ["2026-06-10",2048000],["2026-06-11",2101000],["2026-06-12",2150000],["2026-06-15",2288000],
+  ["2026-06-16",2382000],["2026-06-17",2521000],["2026-06-18",2685000],["2026-06-19",2764000],
+  ["2026-06-22",2919000],["2026-06-23",2555000],["2026-06-24",2580000],["2026-06-25",2917000],
+  ["2026-06-26",2673000],["2026-06-29",2628000],["2026-06-30",2650000],["2026-07-01",2560000],
+  ["2026-07-02",2187000],["2026-07-03",2425000],
+];
+const VOL_W=0.10;  // 향후 주간 변동성(실제 일 8.2%·연 129% 과열을 다소 진정한 가정)
 const WEEKS=52;
 const wIndex=(iso)=>Math.round((new Date(iso)-START)/(7*864e5));
 const wDate=(w)=>{const dt=new Date(START);dt.setDate(dt.getDate()+w*7);return dt;};
@@ -209,26 +227,40 @@ function renderTargets(cur){
 function drawChart(path,evByWeek){
   const cv=$("chart"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
   const padL=46,padR=12,padT=14,padB=26,x0=padL,x1=W-padR,y0=H-padB,y1=padT;
-  const up=path.map((p,w)=>p*(1+0.02*Math.sqrt(w))),dn=path.map((p,w)=>p*(1-0.02*Math.sqrt(w)));
-  const lo=Math.min(...dn,AVG)*0.99,hi=Math.max(...up,PEAK)*1.01;
-  const sx=(w)=>x0+(w/WEEKS)*(x1-x0),sy=(v)=>y0-((v-lo)/(hi-lo))*(y0-y1);
+  const histPts=HIST.map(h=>({t:new Date(h[0]).getTime(),v:h[1]}));
+  const fcPts=path.map((v,w)=>({t:wDate(w).getTime(),v,w}));
+  const up=fcPts.map(p=>p.v*Math.exp(VOL_W*Math.sqrt(p.w))),dn=fcPts.map(p=>p.v*Math.exp(-VOL_W*Math.sqrt(p.w)));
+  const tmin=histPts[0].t, tmax=fcPts[fcPts.length-1].t;
+  const lo=Math.min(...histPts.map(p=>p.v),...dn,AVG)*0.98, hi=Math.max(...histPts.map(p=>p.v),...up,PEAK)*1.02;
+  const sx=(t)=>x0+((t-tmin)/(tmax-tmin))*(x1-x0), sy=(v)=>y0-((v-lo)/(hi-lo))*(y0-y1);
   ctx.strokeStyle="#2a3140";ctx.fillStyle="#9aa7b6";ctx.font="10px sans-serif";
   for(let g=0;g<=3;g++){const v=lo+(hi-lo)*g/3,y=sy(v);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
     ctx.textAlign="right";ctx.fillText(Math.round(v/10000)+"만",x0-5,y+3);}
+  // forecast band
   ctx.fillStyle="rgba(79,157,255,.13)";ctx.beginPath();
-  up.forEach((v,w)=>{const x=sx(w),y=sy(v);w?ctx.lineTo(x,y):ctx.moveTo(x,y);});
-  for(let w=WEEKS;w>=0;w--)ctx.lineTo(sx(w),sy(dn[w]));ctx.closePath();ctx.fill();
+  fcPts.forEach((p,i)=>{const x=sx(p.t),y=sy(up[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  for(let i=fcPts.length-1;i>=0;i--)ctx.lineTo(sx(fcPts[i].t),sy(dn[i]));ctx.closePath();ctx.fill();
+  // 전고점 / 평단
   if(PEAK>=lo&&PEAK<=hi){ctx.strokeStyle="#ff5b5b";ctx.setLineDash([2,3]);const yp=sy(PEAK);
     ctx.beginPath();ctx.moveTo(x0,yp);ctx.lineTo(x1,yp);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle="#ff9b9b";ctx.textAlign="left";ctx.fillText("전고점 300만",x0+2,yp-3);}
   ctx.strokeStyle="#ffcf5c";ctx.setLineDash([5,4]);const ya=sy(AVG);
   ctx.beginPath();ctx.moveTo(x0,ya);ctx.lineTo(x1,ya);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle="#ffcf5c";ctx.textAlign="left";ctx.fillText("평단 226만",x0+2,ya-3);
+  // 오늘 경계선
+  const tNow=histPts[histPts.length-1].t;ctx.strokeStyle="#4a5568";ctx.setLineDash([2,2]);
+  ctx.beginPath();ctx.moveTo(sx(tNow),y1);ctx.lineTo(sx(tNow),y0);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="#9aa7b6";ctx.textAlign="center";ctx.fillText("오늘",sx(tNow),y1+8);
+  // 실제 일봉(과거)
+  ctx.strokeStyle="#c3ccd8";ctx.lineWidth=1.8;ctx.beginPath();
+  histPts.forEach((p,i)=>{const x=sx(p.t),y=sy(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  // 예상(미래)
   ctx.strokeStyle="#ff5b5b";ctx.lineWidth=2.4;ctx.beginPath();
-  path.forEach((v,w)=>{const x=sx(w),y=sy(v);w?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
-  ctx.fillStyle="#ffcf5c";Object.keys(evByWeek).forEach(w=>{w=+w;ctx.beginPath();ctx.arc(sx(w),sy(path[w]),3,0,7);ctx.fill();});
+  ctx.moveTo(sx(tNow),sy(histPts[histPts.length-1].v));
+  fcPts.forEach(p=>{ctx.lineTo(sx(p.t),sy(p.v));});ctx.stroke();
+  ctx.fillStyle="#ffcf5c";Object.keys(evByWeek).forEach(w=>{w=+w;ctx.beginPath();ctx.arc(sx(fcPts[w].t),sy(fcPts[w].v),3,0,7);ctx.fill();});
   ctx.fillStyle="#9aa7b6";ctx.textAlign="center";ctx.font="9px sans-serif";
-  [0,13,26,39,52].forEach(w=>{ctx.fillText(fmtD(wDate(w)),sx(w),y0+15);});
+  [0,13,26,39,52].forEach(w=>{ctx.fillText(fmtD(wDate(w)),sx(wDate(w).getTime()),y0+15);});
 }
 
 function renderConcl(cur,path){
