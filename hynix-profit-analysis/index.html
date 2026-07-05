@@ -3,21 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>하이닉스 주별 예상 주가</title>
+<title>하이닉스 예상 주가 (실적·PER 반영)</title>
 <style>
-  :root{
-    --bg:#0e1116;--panel:#161b22;--panel-2:#1c2330;--line:#2a3140;
-    --text:#e6edf3;--muted:#9aa7b6;--accent:#4f9dff;--up:#ff5b5b;--down:#4f9dff;--gold:#ffcf5c;--green:#3fd07a;
-  }
-  *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","맑은 고딕",Roboto,sans-serif;
-    background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+  :root{--bg:#0e1116;--panel:#161b22;--panel-2:#1c2330;--line:#2a3140;--text:#e6edf3;--muted:#9aa7b6;--accent:#4f9dff;--up:#ff5b5b;--down:#4f9dff;--gold:#ffcf5c;--green:#3fd07a}
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","맑은 고딕",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
   .wrap{max-width:680px;margin:0 auto;padding:18px 13px 60px}
   h1{margin:0 0 3px;font-size:20px}
   .lead{color:var(--muted);font-size:13px;margin:0 0 4px}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:14px}
-  .panel h2{margin:0 0 12px;font-size:15px;font-weight:700}
+  .panel h2{margin:0 0 4px;font-size:15px;font-weight:700}
+  .panel .sub{color:var(--muted);font-size:12.5px;margin:0 0 12px}
   .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
   @media(max-width:430px){.cards{grid-template-columns:1fr 1fr}}
   .card{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:11px}
@@ -30,197 +26,205 @@
   th{color:var(--muted);font-weight:600;font-size:12px}
   td:first-child,th:first-child{text-align:left}
   tr.ev td{background:rgba(255,207,92,.09)}
+  tr.hl td{background:rgba(63,208,122,.12)}
+  tr.now2 td{background:rgba(79,157,255,.12)}
   .evname{font-size:11px;color:var(--gold);display:block}
-  .twrap{max-height:360px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
+  .twrap{max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
   .tip{font-size:12px;color:var(--muted);margin-top:9px}
   .concl{background:linear-gradient(180deg,#14261c,#111a15);border:1px solid #23402e;border-radius:12px;padding:15px;font-size:14px;line-height:1.85}
   .concl b{color:var(--green)}
   .concl .big{font-size:15px;font-weight:800;margin-bottom:8px;color:var(--text)}
-  .in{display:flex;gap:9px;align-items:center;margin-top:4px}
+  .in{display:flex;gap:9px;align-items:center;margin-top:4px;flex-wrap:wrap}
   .in label{font-size:12px;color:var(--muted)}
   .in input{width:130px;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right;outline:none}
   .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:2px}
-  .seg button{background:none;border:none;color:var(--muted);padding:8px 12px;font-size:13px;cursor:pointer}
+  .seg button{background:none;border:none;color:var(--muted);padding:8px 11px;font-size:12.5px;cursor:pointer}
   .seg button.on{background:var(--accent);color:#06101f;font-weight:700}
   .foot{margin-top:20px;color:var(--muted);font-size:11px;text-align:center}
+  .why{background:#101a26;border:1px solid #1f3350;border-radius:10px;padding:12px;font-size:13px;line-height:1.75;margin-bottom:12px}
+  .why b{color:#8fc0ff}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>SK하이닉스 주별 예상 주가</h1>
-  <p class="lead">평단 226만원 · 42주 보유 기준 · 증권가 강세 전망을 반영한 예상</p>
-  <p class="lead" style="color:#e0c9a6">최근 흐름: 6/23 사상 최고 <b>300만원</b> 터치 → 급락 → 7/2 저점 <b>218만원</b> → 현재 약 242만원. <b>300만원은 이미 찍고 내려온 전고점</b>입니다.</p>
+  <h1>SK하이닉스 예상 주가 <span style="font-size:12px;color:var(--muted)">실적·PER 반영</span></h1>
+  <p class="lead">평단 226만원 · 42주 보유 기준</p>
+  <p class="lead" style="color:#e0c9a6">최근: 6/23 사상최고 <b>300만</b> → 7/2 저점 <b>218만</b> → 현재 약 242만. 300만은 이미 찍고 내려온 전고점.</p>
 
   <section class="panel">
     <h2>지금 내 상태</h2>
     <div class="cards" id="now"></div>
-    <div class="in"><label>현재가</label><input id="cur" type="number" value="2425000" step="1000"/><span class="muted" style="font-size:12px">원 (바뀌면 여기만 수정)</span></div>
-    <div class="in" style="margin-top:10px"><label>전망</label>
+    <div class="in"><label>현재가</label><input id="cur" type="number" value="2425000" step="1000"/><span class="muted" style="font-size:12px">원</span></div>
+    <div class="in" style="margin-top:10px"><label>전망(목표 PER)</label>
       <span class="seg" id="seg">
-        <button data-m="0.05">신중</button>
-        <button data-m="0.15" class="on">증권가 기본</button>
-        <button data-m="0.30">강세</button>
+        <button data-per="7">신중 · PER 7배</button>
+        <button data-per="10" class="on">증권가 · PER 10배</button>
+        <button data-per="12">강세 · PER 12배</button>
       </span>
     </div>
   </section>
 
   <section class="panel">
-    <h2>예상 주가 흐름</h2>
-    <canvas id="chart" width="660" height="250"></canvas>
-    <p class="tip">빨간선 = 예상 주가 · 노란 점선 = 내 평단 · 옅은 영역 = 오르내릴 수 있는 범위</p>
-  </section>
-
-  <section class="panel">
-    <h2>주별 예상 주가 & 지금 팔면 내 손익</h2>
-    <div class="twrap">
-      <table id="weekly"><thead><tr><th>날짜</th><th>예상 주가</th><th>팔면 내 손익</th></tr></thead><tbody></tbody></table>
+    <h2>왜 더 오를 수 있나 — 이익 × PER</h2>
+    <div class="why">
+      주가 = <b>1년 예상 이익(주당 약 43만원)</b> × <b>PER</b>.<br>
+      지금 PER은 <b id="curper">약 5.6배</b>인데, 마이크론 등 글로벌 반도체는 <b>10배 이상</b>. 게다가 2분기 영업이익이 전년비 <b>+589%</b> 폭증. <b>이익이 늘고 PER이 정상화되면 그 곱만큼 크게 오릅니다.</b> (한화 목표 430만 = 43만 × 10배 / 노무라 500만)
     </div>
-    <p class="tip">노란 줄 = 실적·이벤트가 있는 주</p>
+    <table id="valu"><thead><tr><th>PER</th><th>그때 주가</th><th>내 손익(42주)</th></tr></thead><tbody></tbody></table>
+    <p class="tip">1년 예상 이익(EPS)은 시간이 갈수록 더 커져(2027년 46만원+) 같은 PER이어도 주가는 더 오를 수 있습니다.</p>
   </section>
 
   <section class="panel">
-    <h2>이 가격에 팔면?</h2>
-    <table id="targets"><thead><tr><th>매도가</th><th>내 돈 대비</th><th>팔면 내 손익(세후)</th></tr></thead><tbody></tbody></table>
+    <h2>예상 주가 흐름 (선택한 전망까지)</h2>
+    <canvas id="chart" width="660" height="250"></canvas>
+    <p class="tip">빨간선 = 예상 주가 · 노란 점선 = 평단 · 붉은 점선 = 전고점 300만 · 노란 점 = 실적·이벤트</p>
   </section>
 
   <section class="panel">
-    <h2>결론 — 언제 팔까</h2>
+    <h2>주별 예상 주가 & 지금 팔면 손익</h2>
+    <div class="twrap"><table id="weekly"><thead><tr><th>날짜</th><th>예상 주가</th><th>팔면 손익</th></tr></thead><tbody></tbody></table></div>
+    <p class="tip">노란 줄 = 실적·이벤트 있는 주</p>
+  </section>
+
+  <section class="panel">
+    <h2>이 가격에 팔면? (세후)</h2>
+    <table id="targets"><thead><tr><th>매도가</th><th>내 돈 대비</th><th>팔면 손익</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section class="panel">
+    <h2>결론 — 어떻게 할까</h2>
     <div class="concl" id="concl"></div>
   </section>
 
-  <p class="foot">예상은 가정에 기반한 참고용이며 실제 주가·수익을 보장하지 않습니다.</p>
+  <p class="foot">예상은 증권가 컨센서스·가정에 기반한 참고용이며 실제 주가·수익을 보장하지 않습니다.</p>
 </div>
 
 <script>
 const $=(id)=>document.getElementById(id);
 const AVG=2264880, QTY=42;
-const PEAK=3000000;   // 6/23 사상 최고가(전고점)
-const LOW=2187000;    // 7/2 최근 저점
+const FWD_EPS=429777;   // 12개월 선행 EPS (한화, 목표 430만=43만×10배)
+const PEAK=3000000, LOW=2187000;
+const AFTERTAX=0.99835; // 세금+수수료 대략
 const man=(n)=>Math.round(n/10000).toLocaleString("ko-KR")+"만원";
 const plMan=(n)=>(n>=0?"+":"−")+Math.abs(Math.round(n/10000)).toLocaleString("ko-KR")+"만원";
 const pctv=(n)=>(n>=0?"+":"")+Math.round(n)+"%";
 const cls=(n)=>n>0?"up":n<0?"down":"muted";
 
-// 이벤트: 시작 기준 주차, 이름, 기대 상승효과(%)
 const START=new Date("2026-07-05");
 const EVENTS=[
-  {d:"2026-07-07",n:"삼성 실적",j:1.6},
-  {d:"2026-07-10",n:"나스닥 상장",j:2.4},
-  {d:"2026-07-23",n:"2분기 실적",j:2.8},
-  {d:"2026-09-30",n:"엔비디아·업황",j:5.4},
-  {d:"2026-10-28",n:"3분기 실적",j:4.4},
-  {d:"2026-12-31",n:"연말·HBM4",j:4.2},
-  {d:"2027-06-30",n:"슈퍼사이클",j:4.9},
+  {d:"2026-07-07",n:"삼성 실적",j:2},
+  {d:"2026-07-10",n:"나스닥 상장(ADR)",j:4},
+  {d:"2026-07-23",n:"2분기 실적(+589%)",j:5},
+  {d:"2026-09-30",n:"엔비디아·업황",j:4},
+  {d:"2026-10-28",n:"3분기 실적",j:5},
+  {d:"2026-12-31",n:"연말·HBM4",j:3},
+  {d:"2027-06-30",n:"슈퍼사이클",j:3},
 ];
 const WEEKS=52;
 const wIndex=(iso)=>Math.round((new Date(iso)-START)/(7*864e5));
 const wDate=(w)=>{const dt=new Date(START);dt.setDate(dt.getDate()+w*7);return dt;};
 const fmtD=(dt)=>`${dt.getFullYear()%100}.${dt.getMonth()+1}.${dt.getDate()}`;
 
-let baseMu=0.15;
+let targetPER=10;
 
 function buildPath(cur){
-  const evByWeek={};EVENTS.forEach(e=>{const w=wIndex(e.d);if(w>=0&&w<=WEEKS)evByWeek[w]=e;});
-  const g=baseMu/52;
+  const target=FWD_EPS*targetPER;
+  const evByWeek={};let prodEv=1;
+  EVENTS.forEach(e=>{const w=wIndex(e.d);if(w>=0&&w<=WEEKS){evByWeek[w]=e;prodEv*=(1+e.j/100);}});
+  // 남은 상승은 매주 완만하게: cur * b^52 * prodEv = target
+  const b=Math.pow(target/cur/prodEv, 1/WEEKS);
   const path=[cur];let p=cur;
-  for(let w=1;w<=WEEKS;w++){
-    p*=(1+g);
-    if(evByWeek[w]) p*=(1+evByWeek[w].j/100);
-    path.push(p);
-  }
-  return {path,evByWeek};
+  for(let w=1;w<=WEEKS;w++){p*=b;if(evByWeek[w])p*=(1+evByWeek[w].j/100);path.push(p);}
+  return {path,evByWeek,target};
 }
 
 function renderNow(cur){
   const pl=(cur-AVG)*QTY, rate=(cur/AVG-1)*100;
   $("now").innerHTML=[
-    {k:"평단(1주)",v:man(AVG)},
-    {k:"현재가",v:man(cur)},
-    {k:"지금 손익",v:plMan(pl),c:cls(pl)},
+    {k:"평단(1주)",v:man(AVG)},{k:"현재가",v:man(cur)},{k:"지금 손익",v:plMan(pl),c:cls(pl)},
   ].map(c=>`<div class="card"><div class="k">${c.k}</div><div class="v ${c.c||""}">${c.v}</div></div>`).join("");
+  $("curper").textContent="약 "+(cur/FWD_EPS).toFixed(1)+"배";
+}
+
+function renderValu(cur){
+  const curPer=cur/FWD_EPS;
+  const rows=[
+    {per:curPer,t:"지금"},{per:7,t:""},{per:8,t:""},{per:10,t:"한화 목표"},{per:12,t:"노무라급"},{per:14,t:""},
+  ];
+  $("valu").querySelector("tbody").innerHTML=rows.map(r=>{
+    const price=FWD_EPS*r.per, pl=(price*AFTERTAX-AVG)*QTY;
+    const hl=Math.abs(r.per-targetPER)<0.01;
+    return `<tr class="${hl?"hl":""}"><td>${r.per.toFixed(1)}배 <span class="muted" style="font-size:11px">${r.t}</span></td>
+      <td>${man(price)}</td><td class="${cls(pl)}">${plMan(pl)}</td></tr>`;
+  }).join("");
 }
 
 function renderWeekly(path,evByWeek){
   let rows="";
-  for(let w=1;w<=WEEKS;w++){
-    const price=path[w], pl=(price-AVG)*QTY, ev=evByWeek[w];
+  for(let w=1;w<=WEEKS;w++){const price=path[w],pl=(price-AVG)*QTY,ev=evByWeek[w];
     rows+=`<tr class="${ev?"ev":""}"><td>${fmtD(wDate(w))}${ev?`<span class="evname">${ev.n}</span>`:""}</td>
-      <td>${man(price)}</td><td class="${cls(pl)}">${plMan(pl)}</td></tr>`;
-  }
+      <td>${man(price)}</td><td class="${cls(pl)}">${plMan(pl)}</td></tr>`;}
   $("weekly").querySelector("tbody").innerHTML=rows;
 }
 
 function renderTargets(cur){
-  const fee=0.00165; // 세금+수수료 대략
   const rows=[
-    {n:"7/2 저점",p:LOW},
-    {n:"본전(평단)",p:AVG},
-    {n:"현재가",p:cur},
-    {n:"전고점(6/23 최고가)",p:PEAK},
-    {n:"350만원",p:3500000},
-    {n:"400만원(목표가)",p:4000000},
+    {n:"7/2 저점",p:LOW},{n:"본전(평단)",p:AVG},{n:"현재가",p:cur},
+    {n:"전고점(6/23)",p:PEAK},{n:"목표 400만",p:4000000},{n:"노무라 500만",p:5000000},
   ];
   $("targets").querySelector("tbody").innerHTML=rows.map(r=>{
-    const net=(r.p*(1-fee)-AVG)*QTY, d=(r.p/AVG-1)*100;
-    return `<tr><td>${man(r.p)} <span class="muted" style="font-size:11px">${r.n}</span></td>
+    const net=(r.p*AFTERTAX-AVG)*QTY,d=(r.p/AVG-1)*100;
+    const now2=Math.abs(r.p-cur)<1;
+    return `<tr class="${now2?"now2":""}"><td>${man(r.p)} <span class="muted" style="font-size:11px">${r.n}</span></td>
       <td class="${cls(d)}">${pctv(d)}</td><td class="${cls(net)}">${plMan(net)}</td></tr>`;
   }).join("");
 }
 
-function drawChart(path,evByWeek,cur){
+function drawChart(path,evByWeek){
   const cv=$("chart"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
   const padL=46,padR=12,padT=14,padB=26,x0=padL,x1=W-padR,y0=H-padB,y1=padT;
-  // 범위(불확실성): ±주차에 따라 커지는 폭 (시각용)
-  const up=path.map((p,w)=>p*(1+0.02*Math.sqrt(w)));
-  const dn=path.map((p,w)=>p*(1-0.02*Math.sqrt(w)));
-  const lo=Math.min(...dn,AVG)*0.99, hi=Math.max(...up,AVG)*1.01;
-  const sx=(w)=>x0+(w/WEEKS)*(x1-x0), sy=(v)=>y0-((v-lo)/(hi-lo))*(y0-y1);
+  const up=path.map((p,w)=>p*(1+0.02*Math.sqrt(w))),dn=path.map((p,w)=>p*(1-0.02*Math.sqrt(w)));
+  const lo=Math.min(...dn,AVG)*0.99,hi=Math.max(...up,PEAK)*1.01;
+  const sx=(w)=>x0+(w/WEEKS)*(x1-x0),sy=(v)=>y0-((v-lo)/(hi-lo))*(y0-y1);
   ctx.strokeStyle="#2a3140";ctx.fillStyle="#9aa7b6";ctx.font="10px sans-serif";
   for(let g=0;g<=3;g++){const v=lo+(hi-lo)*g/3,y=sy(v);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
     ctx.textAlign="right";ctx.fillText(Math.round(v/10000)+"만",x0-5,y+3);}
-  // band
   ctx.fillStyle="rgba(79,157,255,.13)";ctx.beginPath();
   up.forEach((v,w)=>{const x=sx(w),y=sy(v);w?ctx.lineTo(x,y):ctx.moveTo(x,y);});
   for(let w=WEEKS;w>=0;w--)ctx.lineTo(sx(w),sy(dn[w]));ctx.closePath();ctx.fill();
-  // 전고점선(6/23 300만)
   if(PEAK>=lo&&PEAK<=hi){ctx.strokeStyle="#ff5b5b";ctx.setLineDash([2,3]);const yp=sy(PEAK);
     ctx.beginPath();ctx.moveTo(x0,yp);ctx.lineTo(x1,yp);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle="#ff9b9b";ctx.textAlign="left";ctx.fillText("전고점 300만(6/23)",x0+2,yp-3);}
-  // 평단선
+    ctx.fillStyle="#ff9b9b";ctx.textAlign="left";ctx.fillText("전고점 300만",x0+2,yp-3);}
   ctx.strokeStyle="#ffcf5c";ctx.setLineDash([5,4]);const ya=sy(AVG);
   ctx.beginPath();ctx.moveTo(x0,ya);ctx.lineTo(x1,ya);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle="#ffcf5c";ctx.textAlign="left";ctx.fillText("평단 226만",x0+2,ya-3);
-  // 예상선
   ctx.strokeStyle="#ff5b5b";ctx.lineWidth=2.4;ctx.beginPath();
   path.forEach((v,w)=>{const x=sx(w),y=sy(v);w?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
-  // 이벤트 점
   ctx.fillStyle="#ffcf5c";Object.keys(evByWeek).forEach(w=>{w=+w;ctx.beginPath();ctx.arc(sx(w),sy(path[w]),3,0,7);ctx.fill();});
-  // x축
   ctx.fillStyle="#9aa7b6";ctx.textAlign="center";ctx.font="9px sans-serif";
   [0,13,26,39,52].forEach(w=>{ctx.fillText(fmtD(wDate(w)),sx(w),y0+15);});
 }
 
 function renderConcl(cur,path){
-  const end=path[WEEKS];
-  const dnToAvg=(cur/AVG-1)*100;      // 평단까지 여유(양수면 평단 위)
+  const end=path[WEEKS], dnToAvg=(cur/AVG-1)*100;
   $("concl").innerHTML=`
-    <div class="big">이 종목은 하루 10~15% 흔들려서, 자주 사고팔면 포지션 잃기 쉽습니다. 안 흔들리는 게 이깁니다.</div>
-    당신 강점: <b>평단이 226만으로 낮음</b> → 지금도 +${Math.round(dnToAvg)}%. 평단까지 내려도 −${Math.round(dnToAvg)}%인데 증권가 목표는 400만(+65%). <b>손해 위험은 작고 상승 여지가 큰 자리</b>라 굳이 자주 팔 이유가 없습니다.<br><br>
-    <b>1) 코어 28주(3분의 2)는 안 팔고 2027년까지 보유</b> — 슈퍼사이클 목표 350만~400만(<b>${man(end)}</b> 부근 예상).<br>
-    <b>2) 나머지 14주만 가볍게</b> — 전고점 300만을 <b>회복할 때(오를 때)만</b> 절반(7주) 덜어 이익 확보. 세후 약 ${plMan((PEAK*0.99835-AVG)*7)}. 빠질 때는 팔지 마세요.<br>
-    <b>3) 손절(스톱)은 평단 근처에 걸지 마세요</b> — 7/2에도 218만까지 빠졌다 바로 반등했습니다. 평단에 손절 걸면 바닥에서 팔리고 포지션만 잃습니다. 팔 거면 <b>오를 때만</b>.<br>
-    <span class="muted" style="font-size:12.5px">요약: 대부분 그냥 보유 → 전고점 회복(오를 때)에만 조금씩 덜기 → 내릴 때는 팔지 않기.</span>
+    <div class="big">저평가(PER 반값) + 낮은 평단 = 서두를 이유 없음. 흔들려도 코어는 들고 가세요.</div>
+    지금 PER 약 ${(cur/FWD_EPS).toFixed(1)}배로 글로벌(10배+)의 반값. 실적 급증 + ADR 리레이팅이 겹치면 <b>${man(end)}(PER ${targetPER}배)</b>도 무리가 아닙니다. 님은 평단이 226만으로 낮아 지금도 +${Math.round(dnToAvg)}%, 위험은 작고 상승 여지는 큽니다.<br><br>
+    <b>1) 코어 28주(3분의 2)는 리레이팅 끝까지 보유</b> — 2027년 <b>${man(end)}</b>까지 노림.<br>
+    <b>2) 나머지 14주만 가볍게</b> — 전고점 300만을 <b>회복할 때(오를 때)만</b> 절반(7주) 덜어 이익 확보. 빠질 때는 안 팜.<br>
+    <b>3) 손절은 평단 근처에 걸지 말 것</b> — 7/2에 218만까지 빠졌다 바로 반등. 평단 손절은 바닥에 팔려 포지션만 잃습니다. 팔 거면 오를 때만.<br>
+    <span class="muted" style="font-size:12.5px">요약: 저평가라 대부분 보유 → 오를 때만 조금씩 덜기 → 내릴 때 안 팔기.</span>
   `;
 }
 
 function update(){
   const cur=+$("cur").value||0;
   const {path,evByWeek}=buildPath(cur);
-  renderNow(cur);renderWeekly(path,evByWeek);renderTargets(cur);drawChart(path,evByWeek,cur);renderConcl(cur,path);
+  renderNow(cur);renderValu(cur);renderWeekly(path,evByWeek);renderTargets(cur);drawChart(path,evByWeek);renderConcl(cur,path);
 }
 $("cur").addEventListener("input",update);
 $("seg").addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;
-  baseMu=+b.dataset.m;[...$("seg").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
+  targetPER=+b.dataset.per;[...$("seg").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
 update();
 </script>
 </body>
