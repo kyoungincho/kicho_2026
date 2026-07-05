@@ -49,6 +49,7 @@
 <div class="wrap">
   <h1>SK하이닉스 주별 예상 주가</h1>
   <p class="lead">평단 226만원 · 42주 보유 기준 · 증권가 강세 전망을 반영한 예상</p>
+  <p class="lead" style="color:#e0c9a6">최근 흐름: 6/23 사상 최고 <b>300만원</b> 터치 → 급락 → 7/2 저점 <b>218만원</b> → 현재 약 242만원. <b>300만원은 이미 찍고 내려온 전고점</b>입니다.</p>
 
   <section class="panel">
     <h2>지금 내 상태</h2>
@@ -93,6 +94,8 @@
 <script>
 const $=(id)=>document.getElementById(id);
 const AVG=2264880, QTY=42;
+const PEAK=3000000;   // 6/23 사상 최고가(전고점)
+const LOW=2187000;    // 7/2 최근 저점
 const man=(n)=>Math.round(n/10000).toLocaleString("ko-KR")+"만원";
 const plMan=(n)=>(n>=0?"+":"−")+Math.abs(Math.round(n/10000)).toLocaleString("ko-KR")+"만원";
 const pctv=(n)=>(n>=0?"+":"")+Math.round(n)+"%";
@@ -150,9 +153,10 @@ function renderWeekly(path,evByWeek){
 function renderTargets(cur){
   const fee=0.00165; // 세금+수수료 대략
   const rows=[
+    {n:"7/2 저점",p:LOW},
     {n:"본전(평단)",p:AVG},
     {n:"현재가",p:cur},
-    {n:"300만원",p:3000000},
+    {n:"전고점(6/23 최고가)",p:PEAK},
     {n:"350만원",p:3500000},
     {n:"400만원(목표가)",p:4000000},
   ];
@@ -178,10 +182,14 @@ function drawChart(path,evByWeek,cur){
   ctx.fillStyle="rgba(79,157,255,.13)";ctx.beginPath();
   up.forEach((v,w)=>{const x=sx(w),y=sy(v);w?ctx.lineTo(x,y):ctx.moveTo(x,y);});
   for(let w=WEEKS;w>=0;w--)ctx.lineTo(sx(w),sy(dn[w]));ctx.closePath();ctx.fill();
+  // 전고점선(6/23 300만)
+  if(PEAK>=lo&&PEAK<=hi){ctx.strokeStyle="#ff5b5b";ctx.setLineDash([2,3]);const yp=sy(PEAK);
+    ctx.beginPath();ctx.moveTo(x0,yp);ctx.lineTo(x1,yp);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#ff9b9b";ctx.textAlign="left";ctx.fillText("전고점 300만(6/23)",x0+2,yp-3);}
   // 평단선
   ctx.strokeStyle="#ffcf5c";ctx.setLineDash([5,4]);const ya=sy(AVG);
   ctx.beginPath();ctx.moveTo(x0,ya);ctx.lineTo(x1,ya);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle="#ffcf5c";ctx.textAlign="left";ctx.fillText("평단",x0+2,ya-3);
+  ctx.fillStyle="#ffcf5c";ctx.textAlign="left";ctx.fillText("평단 226만",x0+2,ya-3);
   // 예상선
   ctx.strokeStyle="#ff5b5b";ctx.lineWidth=2.4;ctx.beginPath();
   path.forEach((v,w)=>{const x=sx(w),y=sy(v);w?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
@@ -195,11 +203,11 @@ function drawChart(path,evByWeek,cur){
 function renderConcl(cur,path){
   const end=path[WEEKS];
   $("concl").innerHTML=`
-    <div class="big">지금 당장 팔 필요는 없습니다.</div>
-    <b>1) 하반기까지 보유</b> — 7월·10월 실적과 HBM4 양산이 줄줄이 있어, 지금 파는 건 이릅니다.<br>
-    <b>2) 300만원부터 나눠서 익절</b> — 주가가 <b>약 300만원(내 돈 +32%)</b>에 닿으면 <b>절반</b> 팔아 이익을 확보하세요. 42주 중 21주만 팔아도 세후 약 ${plMan((3000000*0.99835-AVG)*21)} 실현.<br>
-    <b>3) 나머지는 목표 350만~400만원</b> — 남은 물량은 예상 흐름상 <b>2027년 상반기 ${man(end)} 부근</b>을 목표로 들고 가되, <b>고점에서 15% 넘게 빠지면 파세요</b>(하락 방어).<br>
-    <span class="muted" style="font-size:12.5px">요약: 지금 홀드 → 300만원 절반 익절 → 나머지 350~400만원 목표, 급락 시 정리.</span>
+    <div class="big">지금은 전고점(300만)에서 조정받은 자리 — 급하게 팔 필요 없음.</div>
+    <b>1) 전고점(300만) 회복까지 보유</b> — 300만은 이미 한 번 찍고 내려온 <b>사상 최고가</b>라 그 근처엔 팔려는 물량(저항)이 많습니다. 7월·10월 실적과 HBM4 양산으로 <b>다시 300만을 회복하는지</b>가 관건. 예상상 회복은 <b>올 하반기~연말</b>쯤입니다.<br>
+    <b>2) 전고점 300만 부근에서 절반 익절</b> — 다시 300만에 닿으면 <b>절반(21주)</b> 파세요. 세후 약 ${plMan((PEAK*0.99835-AVG)*21)} 실현. 전고점은 뚫기 어려운 자리라 이익 확보가 합리적.<br>
+    <b>3) 나머지는 350만~400만 목표, 대신 하방 방어</b> — 남은 물량은 <b>2027년 상반기 ${man(end)} 부근</b>을 노리되, <b>평단 226만 아래로 내려가면 일부 정리</b>하세요(7/2엔 218만까지 빠진 적 있음).<br>
+    <span class="muted" style="font-size:12.5px">요약: 지금 홀드 → 전고점 300만 회복 시 절반 익절 → 나머지 350~400만 목표, 단 226만 깨지면 방어.</span>
   `;
 }
 
