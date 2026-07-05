@@ -62,6 +62,24 @@
         <button data-per="12">강세 · PER 12배</button>
       </span>
     </div>
+    <div class="in" style="margin-top:10px"><label>회복 속도</label>
+      <span class="seg" id="segspeed">
+        <button data-s="0.5" class="on">빠름</button>
+        <button data-s="1">보통</button>
+        <button data-s="1.8">느림</button>
+      </span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>수급 — 외국인·기관·개미 어떻게 움직이나</h2>
+    <div class="why" style="background:#1a1420;border-color:#3a2340">
+      <b style="color:#d79bff">외국인</b>: 상반기 하이닉스 <b>57조 순매도</b>(6/29 하루 7.7조 역대급), 보유율 50.4%로 3년래 최저 → <b>급락 주범·오버행</b>. 단, 패시브 리밸런싱이라 대부분 마무리 → 재유입 가능성.<br>
+      <b style="color:#3fd07a">개인</b>: 상반기 <b>40.8조 순매수</b>(빚투까지) → 지금 주가를 떠받침.<br>
+      <b style="color:#ffcf5c">기관</b>: 14.9조 순매수.<br>
+      <b style="color:#8fc0ff">ADR(7/10)</b>: 신주 2.5% 희석 + 한국ETF 자금 이동 = 단기 노이즈. 큰 패시브 유입(나스닥100)은 <b>12월</b>, SOX는 2027.
+    </div>
+    <p class="tip">해석: 돌파가 늦어질 수 있는 이유 = <b>외국인 오버행</b>. 빨라질 촉매 = <b>7/23 실적 → 외국인 재유입 → 12월 나스닥100 편입</b>. 결정적 돌파는 실적시즌~연말에 몰릴 가능성. 위 "회복 속도"로 조절하세요.</p>
   </section>
 
   <section class="panel">
@@ -126,15 +144,20 @@ const wDate=(w)=>{const dt=new Date(START);dt.setDate(dt.getDate()+w*7);return d
 const fmtD=(dt)=>`${dt.getFullYear()%100}.${dt.getMonth()+1}.${dt.getDate()}`;
 
 let targetPER=10;
+let speed=0.5;   // 회복 속도: 0.5=빠름(초반 급등), 1=보통, 1.8=느림(후반 집중)
 
 function buildPath(cur){
   const target=FWD_EPS*targetPER;
   const evByWeek={};let prodEv=1;
   EVENTS.forEach(e=>{const w=wIndex(e.d);if(w>=0&&w<=WEEKS){evByWeek[w]=e;prodEv*=(1+e.j/100);}});
-  // 남은 상승은 매주 완만하게: cur * b^52 * prodEv = target
-  const b=Math.pow(target/cur/prodEv, 1/WEEKS);
-  const path=[cur];let p=cur;
-  for(let w=1;w<=WEEKS;w++){p*=b;if(evByWeek[w])p*=(1+evByWeek[w].j/100);path.push(p);}
+  // 드리프트 총량 G를 회복 속도(shape)에 따라 앞/뒤로 배분. 끝점은 항상 target.
+  const G=target/(cur*prodEv);
+  const path=[cur];let cumEv=1;
+  for(let w=1;w<=WEEKS;w++){
+    if(evByWeek[w])cumEv*=(1+evByWeek[w].j/100);
+    const frac=Math.pow(w/WEEKS, speed);
+    path.push(cur*Math.pow(G,frac)*cumEv);
+  }
   return {path,evByWeek,target};
 }
 
@@ -159,10 +182,13 @@ function renderValu(cur){
   }).join("");
 }
 
+function breakoutWeek(path){for(let w=1;w<=WEEKS;w++)if(path[w]>=PEAK)return w;return -1;}
+
 function renderWeekly(path,evByWeek){
-  let rows="";
+  const bw=breakoutWeek(path);let rows="";
   for(let w=1;w<=WEEKS;w++){const price=path[w],pl=(price-AVG)*QTY,ev=evByWeek[w];
-    rows+=`<tr class="${ev?"ev":""}"><td>${fmtD(wDate(w))}${ev?`<span class="evname">${ev.n}</span>`:""}</td>
+    const isBk=(w===bw);
+    rows+=`<tr class="${isBk?"hl":ev?"ev":""}"><td>${fmtD(wDate(w))}${isBk?'<span class="evname" style="color:#3fd07a">전고점 300만 돌파</span>':ev?`<span class="evname">${ev.n}</span>`:""}</td>
       <td>${man(price)}</td><td class="${cls(pl)}">${plMan(pl)}</td></tr>`;}
   $("weekly").querySelector("tbody").innerHTML=rows;
 }
@@ -207,9 +233,11 @@ function drawChart(path,evByWeek){
 
 function renderConcl(cur,path){
   const end=path[WEEKS], dnToAvg=(cur/AVG-1)*100;
+  const bw=breakoutWeek(path);
+  const bkTxt = bw>0 ? `이 전망·속도에서 <b>전고점 300만 돌파는 약 ${bw}주 후(${wDate(bw).getMonth()+1}월경)</b>입니다. 실적(7/23)·연말 나스닥100 편입 구간이 분수령.` : `이 전망에서는 1년 내 전고점 300만 재돌파가 어렵게 나옵니다(전망/속도를 올려보세요).`;
   $("concl").innerHTML=`
     <div class="big">저평가(PER 반값) + 낮은 평단 = 서두를 이유 없음. 흔들려도 코어는 들고 가세요.</div>
-    지금 PER 약 ${(cur/FWD_EPS).toFixed(1)}배로 글로벌(10배+)의 반값. 실적 급증 + ADR 리레이팅이 겹치면 <b>${man(end)}(PER ${targetPER}배)</b>도 무리가 아닙니다. 님은 평단이 226만으로 낮아 지금도 +${Math.round(dnToAvg)}%, 위험은 작고 상승 여지는 큽니다.<br><br>
+    지금 PER 약 ${(cur/FWD_EPS).toFixed(1)}배로 글로벌(10배+)의 반값. 실적 급증 + ADR 리레이팅이 겹치면 <b>${man(end)}(PER ${targetPER}배)</b>도 무리가 아닙니다. ${bkTxt} 님은 평단이 226만으로 낮아 지금도 +${Math.round(dnToAvg)}%, 위험은 작고 상승 여지는 큽니다.<br><br>
     <b>1) 코어 28주(3분의 2)는 리레이팅 끝까지 보유</b> — 2027년 <b>${man(end)}</b>까지 노림.<br>
     <b>2) 나머지 14주만 가볍게</b> — 전고점 300만을 <b>회복할 때(오를 때)만</b> 절반(7주) 덜어 이익 확보. 빠질 때는 안 팜.<br>
     <b>3) 손절은 평단 근처에 걸지 말 것</b> — 7/2에 218만까지 빠졌다 바로 반등. 평단 손절은 바닥에 팔려 포지션만 잃습니다. 팔 거면 오를 때만.<br>
@@ -225,6 +253,8 @@ function update(){
 $("cur").addEventListener("input",update);
 $("seg").addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;
   targetPER=+b.dataset.per;[...$("seg").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
+$("segspeed").addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;
+  speed=+b.dataset.s;[...$("segspeed").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
 update();
 </script>
 </body>
