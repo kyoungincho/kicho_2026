@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>하이닉스 향후 수입구간분석</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel-2: #1c2330;
+    --line: #2a3140;
+    --text: #e6edf3;
+    --muted: #9aa7b6;
+    --accent: #4f9dff;
+    --up: #ff5b5b;    /* 한국식: 상승/이익 = 빨강 */
+    --down: #4f9dff;  /* 한국식: 하락/손실 = 파랑 */
+    --gold: #ffcf5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+      "Malgun Gothic", "맑은 고딕", Roboto, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #1a2233 0%, var(--bg) 55%);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 18px 80px; }
+  header h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: -0.5px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 20px;
+  }
+  .panel h2 { margin: 0 0 14px; font-size: 16px; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; }
+  .grid { display: grid; gap: 14px; }
+  .inputs { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  input, select {
+    width: 100%; padding: 10px 12px; border-radius: 9px;
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    font-size: 15px; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  .cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .card {
+    background: linear-gradient(180deg, var(--panel-2), #151b27);
+    border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+  }
+  .card .k { font-size: 12px; color: var(--muted); }
+  .card .v { font-size: 20px; font-weight: 700; margin-top: 6px; }
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+  .muted { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+  td:first-child, th:first-child { text-align: left; }
+  tr.avg td { background: rgba(255,207,92,.08); }
+  tr.now td { background: rgba(79,157,255,.12); }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); margin-left: 6px; }
+  .chartwrap { overflow-x: auto; }
+  canvas { width: 100%; max-width: 100%; height: 320px; display: block; }
+  .foot { margin-top: 26px; color: var(--muted); font-size: 12px; text-align: center; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .row2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>하이닉스 향후 수입구간분석</h1>
+    <p>보유 42주 · 총매입 2,264,880원 (평단 53,926원) 기준 · 미래 매도가별 세후 수익 시뮬레이션</p>
+  </header>
+
+  <section class="panel">
+    <h2>보유 정보 입력</h2>
+    <div class="grid inputs">
+      <div>
+        <label>종목명</label>
+        <input id="name" type="text" value="SK하이닉스" />
+      </div>
+      <div>
+        <label>보유수량 (주)</label>
+        <input id="qty" type="number" value="42" min="0" step="1" />
+      </div>
+      <div>
+        <label>총매입금액 (원)</label>
+        <input id="cost" type="number" value="2264880" min="0" step="1" />
+      </div>
+      <div>
+        <label>평단가 (원) · 자동계산</label>
+        <input id="avg" type="number" value="53926" min="0" step="0.01" />
+      </div>
+      <div>
+        <label>현재가 (원)</label>
+        <input id="cur" type="number" value="200000" min="0" step="100" />
+      </div>
+      <div>
+        <label>매도 수수료율 (%)</label>
+        <input id="fee" type="number" value="0.015" min="0" step="0.001" />
+      </div>
+      <div>
+        <label>증권거래세율 (%, 매도)</label>
+        <input id="tax" type="number" value="0.15" min="0" step="0.01" />
+      </div>
+    </div>
+    <p class="muted" style="font-size:12px;margin:12px 0 0">
+      ※ 평단가는 총매입금액 ÷ 보유수량으로 자동 계산됩니다. 총매입금액 또는 평단가 중 하나를 수정하면 나머지가 갱신됩니다.
+      세금·수수료율은 참고용 기본값이며 증권사·시점에 따라 다릅니다.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>현재 손익 요약</h2>
+    <div class="grid cards" id="summary"></div>
+  </section>
+
+  <section class="panel">
+    <h2>수입구간분석 (매도가별 세후 손익)</h2>
+    <div style="overflow-x:auto">
+      <table id="scenario">
+        <thead>
+          <tr>
+            <th>매도가 (원)</th>
+            <th>평단대비</th>
+            <th>평가금액</th>
+            <th>세전손익</th>
+            <th>세금+수수료</th>
+            <th>세후손익</th>
+            <th>세후수익률</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>세후 손익 곡선</h2>
+    <div class="chartwrap"><canvas id="chart" width="1040" height="320"></canvas></div>
+  </section>
+
+  <p class="foot">kicho_2026 · 본 도구는 투자 판단 보조용 계산기이며 실제 투자 결과를 보장하지 않습니다.</p>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
+const pct = (n) => (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+const cls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "muted");
+
+function readState() {
+  const qty = +$("qty").value || 0;
+  const cost = +$("cost").value || 0;
+  const avg = +$("avg").value || 0;
+  return {
+    name: $("name").value || "종목",
+    qty,
+    cost,
+    avg,
+    cur: +$("cur").value || 0,
+    fee: (+$("fee").value || 0) / 100,
+    tax: (+$("tax").value || 0) / 100,
+  };
+}
+
+// 매도가에 대한 세후 손익 계산
+function netProfit(s, price) {
+  const proceeds = price * s.qty;
+  const taxCost = proceeds * s.tax;
+  const feeCost = proceeds * s.fee;
+  const gross = proceeds - s.cost;
+  const net = gross - taxCost - feeCost;
+  return { proceeds, taxCost, feeCost, gross, net };
+}
+
+function renderSummary(s) {
+  const r = netProfit(s, s.cur);
+  const grossRate = s.cost ? (r.gross / s.cost) * 100 : 0;
+  const netRate = s.cost ? (r.net / s.cost) * 100 : 0;
+  const cards = [
+    { k: "평단가", v: won(s.avg), c: "" },
+    { k: "총매입금액", v: won(s.cost), c: "" },
+    { k: "현재 평가금액", v: won(s.cur * s.qty), c: "" },
+    { k: "평가손익 (세전)", v: won(r.gross), c: cls(r.gross) },
+    { k: "세후 손익", v: won(r.net), c: cls(r.net) },
+    { k: "세후 수익률", v: pct(netRate), c: cls(r.net) },
+  ];
+  $("summary").innerHTML = cards
+    .map((c) => `<div class="card"><div class="k">${c.k}</div><div class="v ${c.c}">${c.v}</div></div>`)
+    .join("");
+}
+
+// 시나리오 매도가 목록 생성: 평단·현재가 + 평단 대비 -30% ~ +300% 구간
+function priceLevels(s) {
+  const set = new Set();
+  const mults = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0];
+  mults.forEach((m) => set.add(Math.round((s.avg * m) / 100) * 100));
+  if (s.cur > 0) set.add(Math.round(s.cur / 100) * 100);
+  set.add(Math.round(s.avg));
+  return [...set].filter((p) => p > 0).sort((a, b) => a - b);
+}
+
+function renderTable(s) {
+  const tbody = $("scenario").querySelector("tbody");
+  const rows = priceLevels(s).map((price) => {
+    const r = netProfit(s, price);
+    const rate = s.cost ? (r.net / s.cost) * 100 : 0;
+    const diff = s.avg ? ((price - s.avg) / s.avg) * 100 : 0;
+    const isAvg = Math.abs(price - Math.round(s.avg)) < 50;
+    const isNow = s.cur > 0 && Math.abs(price - Math.round(s.cur / 100) * 100) < 1;
+    const rowClass = isNow ? "now" : isAvg ? "avg" : "";
+    const label = isAvg ? '<span class="tag">평단</span>' : isNow ? '<span class="tag">현재가</span>' : "";
+    return `<tr class="${rowClass}">
+      <td>${won(price)}${label}</td>
+      <td class="${cls(diff)}">${pct(diff)}</td>
+      <td>${won(r.proceeds)}</td>
+      <td class="${cls(r.gross)}">${won(r.gross)}</td>
+      <td class="muted">${won(r.taxCost + r.feeCost)}</td>
+      <td class="${cls(r.net)}">${won(r.net)}</td>
+      <td class="${cls(r.net)}">${pct(rate)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join("");
+}
+
+function drawChart(s) {
+  const cv = $("chart");
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  const padL = 70, padR = 20, padT = 20, padB = 34;
+  const x0 = padL, x1 = W - padR, y0 = H - padB, y1 = padT;
+
+  const pMin = s.avg * 0.6, pMax = s.avg * 4;
+  const N = 60;
+  const pts = [];
+  for (let i = 0; i <= N; i++) {
+    const price = pMin + ((pMax - pMin) * i) / N;
+    pts.push({ price, net: netProfit(s, price).net });
+  }
+  const nets = pts.map((p) => p.net);
+  const yMin = Math.min(...nets, 0), yMax = Math.max(...nets, 0);
+  const yPad = (yMax - yMin) * 0.08 || 1;
+  const YMIN = yMin - yPad, YMAX = yMax + yPad;
+
+  const sx = (p) => x0 + ((p - pMin) / (pMax - pMin)) * (x1 - x0);
+  const sy = (v) => y0 - ((v - YMIN) / (YMAX - YMIN)) * (y0 - y1);
+
+  // grid + axes
+  ctx.strokeStyle = "#2a3140"; ctx.fillStyle = "#9aa7b6"; ctx.font = "11px sans-serif";
+  ctx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) {
+    const v = YMIN + ((YMAX - YMIN) * g) / 4;
+    const y = sy(v);
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+    ctx.textAlign = "right"; ctx.fillText(Math.round(v / 10000) + "만", x0 - 8, y + 3);
+  }
+  // zero line
+  if (YMIN < 0 && YMAX > 0) {
+    ctx.strokeStyle = "#4a5568"; ctx.setLineDash([4, 4]);
+    const yz = sy(0);
+    ctx.beginPath(); ctx.moveTo(x0, yz); ctx.lineTo(x1, yz); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // x labels
+  ctx.textAlign = "center";
+  for (let g = 0; g <= 5; g++) {
+    const price = pMin + ((pMax - pMin) * g) / 5;
+    ctx.fillText(Math.round(price / 1000) + "천", sx(price), y0 + 18);
+  }
+
+  // profit curve (split by sign color)
+  ctx.lineWidth = 2.2;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i];
+    ctx.strokeStyle = b.net >= 0 ? "#ff5b5b" : "#4f9dff";
+    ctx.beginPath(); ctx.moveTo(sx(a.price), sy(a.net)); ctx.lineTo(sx(b.price), sy(b.net)); ctx.stroke();
+  }
+
+  // markers: 평단(손익분기 근처), 현재가
+  const mark = (price, color, text) => {
+    if (price < pMin || price > pMax) return;
+    const x = sx(price);
+    ctx.strokeStyle = color; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y0); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = color; ctx.textAlign = "center";
+    ctx.fillText(text, x, y1 + 10);
+  };
+  mark(s.avg, "#ffcf5c", "평단");
+  if (s.cur > 0) mark(s.cur, "#4f9dff", "현재가");
+}
+
+let syncing = false;
+function recompute(source) {
+  const qty = +$("qty").value || 0;
+  if (!syncing) {
+    syncing = true;
+    if (source === "avg") {
+      $("cost").value = Math.round((+$("avg").value || 0) * qty);
+    } else {
+      // cost 또는 qty 변경 시 평단 재계산
+      const cost = +$("cost").value || 0;
+      $("avg").value = qty ? (cost / qty).toFixed(2) : 0;
+    }
+    syncing = false;
+  }
+  const s = readState();
+  renderSummary(s);
+  renderTable(s);
+  drawChart(s);
+}
+
+["name", "cur", "fee", "tax"].forEach((id) => $(id).addEventListener("input", () => recompute("other")));
+["qty", "cost"].forEach((id) => $(id).addEventListener("input", () => recompute("cost")));
+$("avg").addEventListener("input", () => recompute("avg"));
+
+recompute("cost");
+</script>
+</body>
+</html>
