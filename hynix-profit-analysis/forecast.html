@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>하이닉스 이벤트별 주가 예상·확률 분석</title>
+<style>
+  :root{
+    --bg:#0e1116;--panel:#161b22;--panel-2:#1c2330;--line:#2a3140;
+    --text:#e6edf3;--muted:#9aa7b6;--accent:#4f9dff;
+    --up:#ff5b5b;--down:#4f9dff;--gold:#ffcf5c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2233 0%,var(--bg) 55%);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 18px 80px}
+  header h1{margin:0 0 4px;font-size:26px;letter-spacing:-.5px}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  a{color:var(--accent);text-decoration:none}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:20px}
+  .panel h2{margin:0 0 14px;font-size:16px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px}
+  .grid{display:grid;gap:14px}
+  .inputs{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  input,select{width:100%;padding:9px 11px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:14px;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  input[type=number]{text-align:right}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .card{background:linear-gradient(180deg,var(--panel-2),#151b27);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .card .k{font-size:12px;color:var(--muted)}
+  .card .v{font-size:19px;font-weight:700;margin-top:6px}
+  .up{color:var(--up)}.down{color:var(--down)}.muted{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:8px 7px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+  td:first-child,th:first-child{text-align:left}
+  .evt input{padding:6px 8px;font-size:13px}
+  .evt td{padding:5px 5px}
+  .btn{cursor:pointer;background:var(--accent);color:#06101f;border:none;border-radius:9px;padding:9px 16px;font-size:14px;font-weight:700}
+  .btn.sec{background:var(--panel-2);color:var(--text);border:1px solid var(--line);font-weight:500}
+  .prob-bar{height:8px;border-radius:6px;background:var(--panel-2);overflow:hidden;min-width:70px}
+  .prob-bar > span{display:block;height:100%;background:linear-gradient(90deg,#4f9dff,#ff5b5b)}
+  canvas{width:100%;max-width:100%;height:340px;display:block}
+  .foot{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
+  .note{font-size:12px;color:var(--muted);margin-top:10px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>하이닉스 이벤트별 주가 예상 · 확률 분석</h1>
+    <p>평단 2,264,880원 · 42주 보유 기준 · 몬테카를로 시뮬레이션으로 이벤트 시점별 예상주가·목표 도달 확률 계산</p>
+    <p style="margin-top:6px"><a href="index.html">← 매도가별 세후 수익 계산기로</a></p>
+  </header>
+
+  <section class="panel">
+    <h2>기본 조건</h2>
+    <div class="grid inputs">
+      <div><label>보유수량 (주)</label><input id="qty" type="number" value="42" step="1"/></div>
+      <div><label>평단가 (원/주)</label><input id="avg" type="number" value="2264880" step="1000"/></div>
+      <div><label>현재가 (원)</label><input id="cur" type="number" value="2425000" step="1000"/></div>
+      <div><label>시뮬레이션 횟수</label>
+        <select id="runs">
+          <option value="20000">20,000</option>
+          <option value="50000" selected>50,000</option>
+          <option value="100000">100,000</option>
+        </select>
+      </div>
+    </div>
+    <p class="note">※ 확률·예상주가는 아래 이벤트 가정에 기반한 <b>시나리오 계산 결과</b>입니다. 미래를 보장하지 않으며, 가정을 바꾸면 결과도 바뀝니다.</p>
+  </section>
+
+  <section class="panel">
+    <h2>이벤트 가정 (수정 가능)</h2>
+    <div style="overflow-x:auto">
+      <table class="evt" id="evtTable">
+        <thead>
+          <tr>
+            <th>예상 시점</th><th>이벤트</th>
+            <th title="상방(호재)으로 갈 확률">상방확률(%)</th>
+            <th title="상방 시 평균 주가 변화">상방영향(%)</th>
+            <th title="하방 시 평균 주가 변화">하방영향(%)</th>
+            <th title="이벤트 결과의 변동성(표준편차)">변동성(%)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="toolbar">
+      <button class="btn sec" id="addEvt">+ 이벤트 추가</button>
+      <button class="btn sec" id="resetEvt">기본값 복원</button>
+      <button class="btn" id="run">▶ 시뮬레이션 실행</button>
+      <span id="status" class="muted" style="font-size:13px"></span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>현재 상태</h2>
+    <div class="grid cards" id="nowCards"></div>
+  </section>
+
+  <section class="panel">
+    <h2>이벤트 시점별 예상 주가</h2>
+    <div style="overflow-x:auto">
+      <table id="horizon">
+        <thead>
+          <tr>
+            <th>시점</th><th>이벤트</th><th>중앙값(예상)</th><th>평균</th>
+            <th>하위 5%</th><th>상위 95%</th><th>평단상회 확률</th>
+            <th>예상 평가금액</th><th>예상 손익</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>목표가 도달 확률 (최종 시점 기준)</h2>
+    <div style="overflow-x:auto">
+      <table id="targets">
+        <thead><tr><th>목표가</th><th>평단대비</th><th>도달 확률</th><th></th><th>도달 시 예상 손익</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>예상 주가 경로 (5%~95% 밴드 · 중앙값)</h2>
+    <canvas id="fan" width="1080" height="340"></canvas>
+  </section>
+
+  <p class="foot">kicho_2026 · 이벤트 확률 시뮬레이션은 투자 판단 보조용이며 실제 주가·수익을 보장하지 않습니다.</p>
+</div>
+
+<script>
+const $=(id)=>document.getElementById(id);
+const won=(n)=>Math.round(n).toLocaleString("ko-KR")+"원";
+const man=(n)=>(n/10000).toLocaleString("ko-KR",{maximumFractionDigits:1})+"만";
+const pct=(n)=>(n>=0?"+":"")+n.toFixed(1)+"%";
+const cls=(n)=>n>0?"up":n<0?"down":"muted";
+
+const DEFAULT_EVENTS=[
+  {d:"2026-07-07",n:"삼성 2Q26 잠정실적",pu:55,up:4,dn:-4.5,vol:3},
+  {d:"2026-07-10",n:"ADR 나스닥 상장",pu:60,up:6,dn:-3,vol:3.5},
+  {d:"2026-07-23",n:"SK하이닉스 2Q26 실적",pu:58,up:9,dn:-9,vol:5},
+  {d:"2026-09-30",n:"엔비디아 Rubin·3Q 업황",pu:60,up:12,dn:-8,vol:6},
+  {d:"2026-10-28",n:"SK하이닉스 3Q26 실적",pu:60,up:10,dn:-9,vol:6},
+  {d:"2026-12-31",n:"연말 HBM4 양산·랠리",pu:57,up:10,dn:-8,vol:6},
+  {d:"2027-06-30",n:"슈퍼사이클 지속(1H27)",pu:55,up:15,dn:-12,vol:10},
+];
+let events=JSON.parse(JSON.stringify(DEFAULT_EVENTS));
+
+function renderEvents(){
+  const tb=$("evtTable").querySelector("tbody");
+  tb.innerHTML=events.map((e,i)=>`<tr>
+    <td><input data-i="${i}" data-k="d" type="text" value="${e.d}" style="width:110px"/></td>
+    <td><input data-i="${i}" data-k="n" type="text" value="${e.n}" style="width:170px;text-align:left"/></td>
+    <td><input data-i="${i}" data-k="pu" type="number" value="${e.pu}" style="width:70px"/></td>
+    <td><input data-i="${i}" data-k="up" type="number" value="${e.up}" style="width:70px"/></td>
+    <td><input data-i="${i}" data-k="dn" type="number" value="${e.dn}" style="width:70px"/></td>
+    <td><input data-i="${i}" data-k="vol" type="number" value="${e.vol}" style="width:70px"/></td>
+    <td><button class="btn sec del" data-i="${i}" style="padding:5px 9px">✕</button></td>
+  </tr>`).join("");
+  tb.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{
+    const i=+inp.dataset.i,k=inp.dataset.k;
+    events[i][k]=(k==="d"||k==="n")?inp.value:(+inp.value||0);
+  }));
+  tb.querySelectorAll(".del").forEach(b=>b.addEventListener("click",()=>{
+    events.splice(+b.dataset.i,1);renderEvents();
+  }));
+}
+
+// Box-Muller
+function gauss(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function quantile(sorted,q){const k=(sorted.length-1)*q,f=Math.floor(k),c=Math.min(f+1,sorted.length-1);
+  return sorted[f]+(sorted[c]-sorted[f])*(k-f);}
+
+function simulate(){
+  const qty=+$("qty").value||0, avg=+$("avg").value||0, cur=+$("cur").value||0;
+  const N=+$("runs").value;
+  const M=events.length;
+  const cols=Array.from({length:M},()=>new Float64Array(N));
+  const finals=new Float64Array(N);
+  for(let p=0;p<N;p++){
+    let price=cur;
+    for(let j=0;j<M;j++){
+      const e=events[j];
+      const shock=(Math.random()<e.pu/100? e.up : e.dn)/100;
+      price*=(1+shock+gauss()*e.vol/100);
+      if(price<price*0) price=1000;
+      if(price<1000) price=1000;
+      cols[j][p]=price;
+    }
+    finals[p]=price;
+  }
+  return {qty,avg,cur,cols,finals};
+}
+
+function renderNow(s){
+  const val=s.cur*s.qty, gain=(s.cur-s.avg)*s.qty, rate=s.avg?(s.cur/s.avg-1)*100:0;
+  const cards=[
+    {k:"평단가",v:won(s.avg)},
+    {k:"보유수량",v:s.qty+"주"},
+    {k:"총매입금액",v:won(s.avg*s.qty)},
+    {k:"현재 평가금액",v:won(val)},
+    {k:"현재 손익",v:won(gain),c:cls(gain)},
+    {k:"현재 수익률",v:pct(rate),c:cls(gain)},
+  ];
+  $("nowCards").innerHTML=cards.map(c=>`<div class="card"><div class="k">${c.k}</div><div class="v ${c.c||""}">${c.v}</div></div>`).join("");
+}
+
+function renderHorizon(s){
+  const tb=$("horizon").querySelector("tbody");
+  const rows=events.map((e,j)=>{
+    const arr=Array.from(s.cols[j]).sort((a,b)=>a-b);
+    const med=quantile(arr,.5), mean=arr.reduce((x,y)=>x+y,0)/arr.length;
+    const p5=quantile(arr,.05), p95=quantile(arr,.95);
+    const above=arr.filter(x=>x>=s.avg).length/arr.length*100;
+    const eqv=med*s.qty, pl=(med-s.avg)*s.qty;
+    return `<tr>
+      <td>${e.d}</td><td style="text-align:left">${e.n}</td>
+      <td>${won(med)}</td><td class="muted">${won(mean)}</td>
+      <td class="down">${won(p5)}</td><td class="up">${won(p95)}</td>
+      <td>${above.toFixed(0)}%</td>
+      <td>${won(eqv)}</td><td class="${cls(pl)}">${won(pl)}</td>
+    </tr>`;
+  });
+  tb.innerHTML=rows.join("");
+}
+
+function renderTargets(s){
+  const finals=Array.from(s.finals);
+  const defs=[
+    {n:"평단 (본전)",v:s.avg},
+    {n:"+20%",v:s.avg*1.2},
+    {n:"+30%",v:s.avg*1.3},
+    {n:"+50%",v:s.avg*1.5},
+    {n:"목표가 400만",v:4000000},
+    {n:"목표가 430만",v:4300000},
+  ];
+  const tb=$("targets").querySelector("tbody");
+  tb.innerHTML=defs.map(t=>{
+    const prob=finals.filter(x=>x>=t.v).length/finals.length*100;
+    const diff=s.avg?(t.v/s.avg-1)*100:0;
+    const pl=(t.v-s.avg)*s.qty;
+    return `<tr>
+      <td>${won(t.v)} <span class="muted">(${man(t.v)})</span></td>
+      <td class="${cls(diff)}">${pct(diff)}</td>
+      <td>${prob.toFixed(1)}%</td>
+      <td style="width:120px"><div class="prob-bar"><span style="width:${prob}%"></span></div></td>
+      <td class="${cls(pl)}">${won(pl)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function drawFan(s){
+  const cv=$("fan"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const padL=64,padR=16,padT=18,padB=48,x0=padL,x1=W-padR,y0=H-padB,y1=padT;
+  const stats=events.map((e,j)=>{const a=Array.from(s.cols[j]).sort((p,q)=>p-q);
+    return {d:e.d,p5:quantile(a,.05),p25:quantile(a,.25),med:quantile(a,.5),p75:quantile(a,.75),p95:quantile(a,.95)};});
+  const pts=[{d:"현재",p5:s.cur,p25:s.cur,med:s.cur,p75:s.cur,p95:s.cur},...stats];
+  const lo=Math.min(...pts.map(p=>p.p5),s.avg)*0.98;
+  const hi=Math.max(...pts.map(p=>p.p95),s.avg)*1.02;
+  const sx=(i)=>x0+(i/(pts.length-1))*(x1-x0);
+  const sy=(v)=>y0-((v-lo)/(hi-lo))*(y0-y1);
+  // grid
+  ctx.strokeStyle="#2a3140";ctx.fillStyle="#9aa7b6";ctx.font="11px sans-serif";
+  for(let g=0;g<=4;g++){const v=lo+(hi-lo)*g/4,y=sy(v);
+    ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
+    ctx.textAlign="right";ctx.fillText(man(v),x0-8,y+3);}
+  // 평단 line
+  ctx.strokeStyle="#ffcf5c";ctx.setLineDash([5,4]);const ya=sy(s.avg);
+  ctx.beginPath();ctx.moveTo(x0,ya);ctx.lineTo(x1,ya);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="#ffcf5c";ctx.textAlign="left";ctx.fillText("평단 "+man(s.avg),x0+4,ya-4);
+  // 5-95 band
+  const band=(loKey,hiKey,color)=>{
+    ctx.fillStyle=color;ctx.beginPath();
+    pts.forEach((p,i)=>{const x=sx(i),y=sy(p[hiKey]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    for(let i=pts.length-1;i>=0;i--){ctx.lineTo(sx(i),sy(pts[i][loKey]));}
+    ctx.closePath();ctx.fill();
+  };
+  band("p5","p95","rgba(79,157,255,.12)");
+  band("p25","p75","rgba(79,157,255,.22)");
+  // median line
+  ctx.strokeStyle="#ff5b5b";ctx.lineWidth=2.2;ctx.beginPath();
+  pts.forEach((p,i)=>{const x=sx(i),y=sy(p.med);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  ctx.fillStyle="#ff5b5b";pts.forEach((p,i)=>{ctx.beginPath();ctx.arc(sx(i),sy(p.med),2.6,0,7);ctx.fill();});
+  // x labels
+  ctx.fillStyle="#9aa7b6";ctx.textAlign="center";ctx.font="10px sans-serif";
+  pts.forEach((p,i)=>{const lab=i===0?"현재":p.d.slice(2);ctx.save();
+    ctx.translate(sx(i),y0+12);ctx.rotate(-0.5);ctx.fillText(lab,0,0);ctx.restore();});
+}
+
+function run(){
+  $("status").textContent="계산 중…";
+  setTimeout(()=>{
+    const t0=performance.now();
+    const s=simulate();
+    renderNow(s);renderHorizon(s);renderTargets(s);drawFan(s);
+    $("status").textContent=`완료 (${(performance.now()-t0).toFixed(0)}ms · ${(+$("runs").value).toLocaleString()}회)`;
+  },30);
+}
+
+$("addEvt").addEventListener("click",()=>{events.push({d:"2027-12-31",n:"신규 이벤트",pu:55,up:8,dn:-8,vol:6});renderEvents();});
+$("resetEvt").addEventListener("click",()=>{events=JSON.parse(JSON.stringify(DEFAULT_EVENTS));renderEvents();run();});
+$("run").addEventListener("click",run);
+["qty","avg","cur"].forEach(id=>$(id).addEventListener("input",()=>renderNow(readNow())));
+function readNow(){return {qty:+$("qty").value||0,avg:+$("avg").value||0,cur:+$("cur").value||0};}
+
+renderEvents();
+renderNow(readNow());
+run();
+</script>
+</body>
+</html>
