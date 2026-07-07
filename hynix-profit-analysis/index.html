@@ -49,17 +49,18 @@
 <div class="wrap">
   <h1>SK하이닉스 예상 주가 <span style="font-size:12px;color:var(--muted)">실적·PER 반영</span></h1>
   <p class="lead">평단 226만원 · 42주 보유 기준</p>
-  <p class="lead" style="color:#e0c9a6">최근: 6/23 사상최고 <b>300만</b> → 7/2 저점 <b>218만</b> → 현재 약 242만. 300만은 이미 찍고 내려온 전고점.</p>
+  <p class="lead" style="color:#e0c9a6">최근: 6/23 사상최고 <b>300만</b> → 7/2 저점 218만 → 7/7 삼성 셀온·서킷브레이커로 <b>약 220만</b>(장중 214만). 300만은 이미 찍고 내려온 전고점.</p>
+  <p class="lead" style="color:#8fc0ff">기준: 국내 증권사 제외, <b>글로벌 IB(노무라·UBS·골드만·JP모건·씨티·모건스탠리)</b>만 반영.</p>
 
   <section class="panel">
     <h2>지금 내 상태</h2>
     <div class="cards" id="now"></div>
-    <div class="in"><label>현재가</label><input id="cur" type="number" value="2425000" step="1000"/><span class="muted" style="font-size:12px">원</span></div>
-    <div class="in" style="margin-top:10px"><label>전망(목표 PER)</label>
+    <div class="in"><label>현재가</label><input id="cur" type="number" value="2199000" step="1000"/><span class="muted" style="font-size:12px">원 (7/7 종가 ~220만)</span></div>
+    <div class="in" style="margin-top:10px"><label>전망(글로벌 IB 목표)</label>
       <span class="seg" id="seg">
-        <button data-per="7">신중 · PER 7배</button>
-        <button data-per="10" class="on">증권가 · PER 10배</button>
-        <button data-per="12">강세 · PER 12배</button>
+        <button data-price="2600000">모건스탠리 경계 · 260만</button>
+        <button data-price="3200000" class="on">UBS·골드만 · 320만</button>
+        <button data-price="4000000">노무라 · 400만</button>
       </span>
     </div>
     <div class="in" style="margin-top:10px"><label>회복 속도</label>
@@ -79,14 +80,14 @@
       <b style="color:#ffcf5c">기관</b>: 14.9조 순매수.<br>
       <b style="color:#8fc0ff">ADR(7/10)</b>: 신주 2.5% 희석 + 한국ETF 자금 이동 = 단기 노이즈. 큰 패시브 유입(나스닥100)은 <b>12월</b>, SOX는 2027.
     </div>
-    <p class="tip">해석: 돌파가 늦어질 수 있는 이유 = <b>외국인 오버행</b>. 빨라질 촉매 = <b>7/23 실적 → 외국인 재유입 → 12월 나스닥100 편입</b>. 결정적 돌파는 실적시즌~연말에 몰릴 가능성. 위 "회복 속도"로 조절하세요.</p>
+    <p class="tip">해석: 돌파가 늦어질 수 있는 이유 = <b>외국인 오버행</b>. 빨라질 촉매 = <b>7/29 실적 → 외국인 재유입 → 12월 나스닥100 편입</b>. 결정적 돌파는 실적시즌~연말에 몰릴 가능성. 위 "회복 속도"로 조절하세요.</p>
   </section>
 
   <section class="panel">
     <h2>왜 더 오를 수 있나 — 이익 × PER</h2>
     <div class="why">
-      주가 = <b>1년 예상 이익(주당 약 43만원)</b> × <b>PER</b>.<br>
-      지금 PER은 <b id="curper">약 5.6배</b>인데, 마이크론 등 글로벌 반도체는 <b>10배 이상</b>. 게다가 2분기 영업이익이 전년비 <b>+589%</b> 폭증. <b>이익이 늘고 PER이 정상화되면 그 곱만큼 크게 오릅니다.</b> (한화 목표 430만 = 43만 × 10배 / 노무라 500만)
+      주가 = <b>1년 예상 이익(주당 약 43만원)</b> × <b>PER</b>. 지금 PER <b id="curper">약 5.1배</b> — 마이크론 등 글로벌 반도체(10배+)의 <b>반값</b>.<br>
+      <b>골드만</b>: 밸류 잣대를 PBR→PER로 전환하며 상향(상승여력 ~53%). <b>UBS</b>: 급락은 일시적 → "저가매수"로 320만. <b>노무라</b>: 최고 400만(구조적 성장주로 재평가). <b>모건스탠리</b>만 피크아웃 경계.
     </div>
     <table id="valu"><thead><tr><th>PER</th><th>그때 주가</th><th>내 손익(42주)</th></tr></thead><tbody></tbody></table>
     <p class="tip">1년 예상 이익(EPS)은 시간이 갈수록 더 커져(2027년 46만원+) 같은 PER이어도 주가는 더 오를 수 있습니다.</p>
@@ -122,13 +123,13 @@
     <div class="concl" id="concl"></div>
   </section>
 
-  <p class="foot">예상은 증권가 컨센서스·가정에 기반한 참고용이며 실제 주가·수익을 보장하지 않습니다.</p>
+  <p class="foot">글로벌 IB 목표·가정에 기반한 참고용이며 실제 주가·수익을 보장하지 않습니다.</p>
 </div>
 
 <script>
 const $=(id)=>document.getElementById(id);
 const AVG=2264880, QTY=42;
-const FWD_EPS=429777;   // 12개월 선행 EPS (한화, 목표 430만=43만×10배)
+const FWD_EPS=430000;   // 12개월 선행 EPS(컨센). 골드만/노무라도 PER 기반 재평가 논리
 const PEAK=3000000, LOW=2187000;
 const AFTERTAX=0.99835; // 세금+수수료 대략
 const man=(n)=>Math.round(n/10000).toLocaleString("ko-KR")+"만원";
@@ -136,11 +137,10 @@ const plMan=(n)=>(n>=0?"+":"−")+Math.abs(Math.round(n/10000)).toLocaleString("
 const pctv=(n)=>(n>=0?"+":"")+Math.round(n)+"%";
 const cls=(n)=>n>0?"up":n<0?"down":"muted";
 
-const START=new Date("2026-07-05");
+const START=new Date("2026-07-07");
 const EVENTS=[
-  {d:"2026-07-07",n:"삼성 실적",j:2},
-  {d:"2026-07-10",n:"나스닥 상장(ADR)",j:4},
-  {d:"2026-07-23",n:"2분기 실적(+589%)",j:5},
+  {d:"2026-07-10",n:"ADR 나스닥 상장",j:4},
+  {d:"2026-07-29",n:"2분기 실적",j:5},
   {d:"2026-09-30",n:"엔비디아·업황",j:4},
   {d:"2026-10-28",n:"3분기 실적",j:5},
   {d:"2026-12-31",n:"연말·HBM4",j:3},
@@ -153,7 +153,7 @@ const HIST=[
   ["2026-06-16",2382000],["2026-06-17",2521000],["2026-06-18",2685000],["2026-06-19",2764000],
   ["2026-06-22",2919000],["2026-06-23",2555000],["2026-06-24",2580000],["2026-06-25",2917000],
   ["2026-06-26",2673000],["2026-06-29",2628000],["2026-06-30",2650000],["2026-07-01",2560000],
-  ["2026-07-02",2187000],["2026-07-03",2425000],
+  ["2026-07-02",2187000],["2026-07-03",2425000],["2026-07-06",2341000],["2026-07-07",2199000],
 ];
 const VOL_W=0.10;  // 향후 주간 변동성(실제 일 8.2%·연 129% 과열을 다소 진정한 가정)
 const WEEKS=52;
@@ -161,11 +161,11 @@ const wIndex=(iso)=>Math.round((new Date(iso)-START)/(7*864e5));
 const wDate=(w)=>{const dt=new Date(START);dt.setDate(dt.getDate()+w*7);return dt;};
 const fmtD=(dt)=>`${dt.getFullYear()%100}.${dt.getMonth()+1}.${dt.getDate()}`;
 
-let targetPER=10;
+let targetPrice=3200000;  // 글로벌 IB 목표가 프리셋
 let speed=0.5;   // 회복 속도: 0.5=빠름(초반 급등), 1=보통, 1.8=느림(후반 집중)
 
 function buildPath(cur){
-  const target=FWD_EPS*targetPER;
+  const target=targetPrice;
   const evByWeek={};let prodEv=1;
   EVENTS.forEach(e=>{const w=wIndex(e.d);if(w>=0&&w<=WEEKS){evByWeek[w]=e;prodEv*=(1+e.j/100);}});
   // 드리프트 총량 G를 회복 속도(shape)에 따라 앞/뒤로 배분. 끝점은 항상 target.
@@ -190,11 +190,12 @@ function renderNow(cur){
 function renderValu(cur){
   const curPer=cur/FWD_EPS;
   const rows=[
-    {per:curPer,t:"지금"},{per:7,t:""},{per:8,t:""},{per:10,t:"한화 목표"},{per:12,t:"노무라급"},{per:14,t:""},
+    {per:curPer,t:"지금"},{per:6,t:"MS 경계권"},{per:7,t:"골드만 300만"},{per:7.44,t:"UBS 320만"},{per:9.3,t:"노무라 400만"},{per:12,t:"글로벌 평균"},
   ];
+  const tgtPer=targetPrice/FWD_EPS;
   $("valu").querySelector("tbody").innerHTML=rows.map(r=>{
     const price=FWD_EPS*r.per, pl=(price*AFTERTAX-AVG)*QTY;
-    const hl=Math.abs(r.per-targetPER)<0.01;
+    const hl=Math.abs(r.per-tgtPer)<0.1;
     return `<tr class="${hl?"hl":""}"><td>${r.per.toFixed(1)}배 <span class="muted" style="font-size:11px">${r.t}</span></td>
       <td>${man(price)}</td><td class="${cls(pl)}">${plMan(pl)}</td></tr>`;
   }).join("");
@@ -213,8 +214,8 @@ function renderWeekly(path,evByWeek){
 
 function renderTargets(cur){
   const rows=[
-    {n:"7/2 저점",p:LOW},{n:"본전(평단)",p:AVG},{n:"현재가",p:cur},
-    {n:"전고점(6/23)",p:PEAK},{n:"목표 400만",p:4000000},{n:"노무라 500만",p:5000000},
+    {n:"본전(평단)",p:AVG},{n:"현재가",p:cur},{n:"전고점(6/23)",p:PEAK},
+    {n:"골드만 300만",p:3000000},{n:"UBS 320만",p:3200000},{n:"노무라 400만",p:4000000},
   ];
   $("targets").querySelector("tbody").innerHTML=rows.map(r=>{
     const net=(r.p*AFTERTAX-AVG)*QTY,d=(r.p/AVG-1)*100;
@@ -266,10 +267,10 @@ function drawChart(path,evByWeek){
 function renderConcl(cur,path){
   const end=path[WEEKS], dnToAvg=(cur/AVG-1)*100;
   const bw=breakoutWeek(path);
-  const bkTxt = bw>0 ? `이 전망·속도에서 <b>전고점 300만 돌파는 약 ${bw}주 후(${wDate(bw).getMonth()+1}월경)</b>입니다. 실적(7/23)·연말 나스닥100 편입 구간이 분수령.` : `이 전망에서는 1년 내 전고점 300만 재돌파가 어렵게 나옵니다(전망/속도를 올려보세요).`;
+  const bkTxt = bw>0 ? `이 전망·속도에서 <b>전고점 300만 돌파는 약 ${bw}주 후(${wDate(bw).getMonth()+1}월경)</b>입니다. 실적(7/29)·연말 나스닥100 편입 구간이 분수령.` : `이 전망에서는 1년 내 전고점 300만 재돌파가 어렵게 나옵니다(전망/속도를 올려보세요).`;
   $("concl").innerHTML=`
-    <div class="big">저평가(PER 반값) + 낮은 평단 = 서두를 이유 없음. 흔들려도 코어는 들고 가세요.</div>
-    지금 PER 약 ${(cur/FWD_EPS).toFixed(1)}배로 글로벌(10배+)의 반값. 실적 급증 + ADR 리레이팅이 겹치면 <b>${man(end)}(PER ${targetPER}배)</b>도 무리가 아닙니다. ${bkTxt} 님은 평단이 226만으로 낮아 지금도 +${Math.round(dnToAvg)}%, 위험은 작고 상승 여지는 큽니다.<br><br>
+    <div class="big">글로벌 IB 다수 "저가매수" — 저평가 + 낮은 평단이라 서두를 이유 없음.</div>
+    지금 PER 약 ${(cur/FWD_EPS).toFixed(1)}배(글로벌 10배+의 반값). <b>UBS·씨티</b>는 이번 급락을 "일시적·과잉반응"으로 진단하고 목표 <b>${man(end)}</b> 제시. 유일한 경계론은 <b>모건스탠리</b>(피크아웃). ${bkTxt} 평단이 226만으로 낮아 리스크는 작습니다.<br><br>
     <b>1) 코어 28주(3분의 2)는 리레이팅 끝까지 보유</b> — 2027년 <b>${man(end)}</b>까지 노림.<br>
     <b>2) 나머지 14주만 가볍게</b> — 전고점 300만을 <b>회복할 때(오를 때)만</b> 절반(7주) 덜어 이익 확보. 빠질 때는 안 팜.<br>
     <b>3) 손절은 평단 근처에 걸지 말 것</b> — 7/2에 218만까지 빠졌다 바로 반등. 평단 손절은 바닥에 팔려 포지션만 잃습니다. 팔 거면 오를 때만.<br>
@@ -284,7 +285,7 @@ function update(){
 }
 $("cur").addEventListener("input",update);
 $("seg").addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;
-  targetPER=+b.dataset.per;[...$("seg").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
+  targetPrice=+b.dataset.price;[...$("seg").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
 $("segspeed").addEventListener("click",(e)=>{const b=e.target.closest("button");if(!b)return;
   speed=+b.dataset.s;[...$("segspeed").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");update();});
 update();
