@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>저평가 우량주 장기투자 워치리스트</title>
+<style>
+  :root{--bg:#0e1116;--panel:#161b22;--panel-2:#1c2330;--line:#2a3140;--text:#e6edf3;--muted:#9aa7b6;--accent:#4f9dff;--up:#ff5b5b;--green:#3fd07a;--gold:#ffcf5c}
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","맑은 고딕",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 13px 70px}
+  h1{margin:0 0 3px;font-size:21px}
+  .lead{color:var(--muted);font-size:13px;margin:0 0 4px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:14px}
+  .panel h2{margin:0 0 10px;font-size:15px;font-weight:700}
+  .muted{color:var(--muted)}.up{color:var(--up)}.green{color:var(--green)}.gold{color:var(--gold)}
+  .warn{background:#241a12;border:1px solid #40311e;border-radius:10px;padding:12px;font-size:13px;color:#e0c9a6;line-height:1.75}
+  .crit{background:#101a26;border:1px solid #1f3350;border-radius:10px;padding:12px;font-size:13px;line-height:1.8}
+  .crit b{color:#8fc0ff}
+  .tabs{display:flex;gap:8px;margin:2px 0 12px;flex-wrap:wrap}
+  .tabs button{cursor:pointer;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:8px 13px;font-size:13px}
+  .tabs button.on{background:var(--accent);color:#06101f;font-weight:700}
+  .stock{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:linear-gradient(180deg,var(--panel-2),#151b27)}
+  .stock .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .stock .nm{font-size:15px;font-weight:800}
+  .stock .tk{font-size:11px;color:var(--muted)}
+  .stock .sec{font-size:11px;color:var(--gold)}
+  .metrics{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}
+  .metric{font-size:11.5px;background:#0e1420;border:1px solid var(--line);border-radius:7px;padding:3px 8px;color:var(--muted)}
+  .metric b{color:var(--text)}
+  .stock .why{font-size:13px;margin:6px 0 0}
+  .stock .risk{font-size:12px;color:var(--muted);margin-top:4px}
+  .foot{margin-top:22px;color:var(--muted);font-size:11px;text-align:center}
+  ul{margin:6px 0;padding-left:18px;font-size:13.5px;line-height:1.8}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>저평가 우량주 장기투자 워치리스트</h1>
+  <p class="lead">싱글파이어 "오일전문가"式(저평가+배당 우량주 장기 무매도) + 글로벌 IB 시각</p>
+
+  <section class="panel">
+    <h2>먼저 — 현실적인 눈높이</h2>
+    <div class="warn">
+      "4000만원 → 55억(137배)"은 <b>①수년~10년+ 장기 ②소수 집중 ③2020~2026 대세 상승장(코스피 9000) ④이익실현용 매도 안 함</b>이 겹친 결과입니다. <b>일반적 목표는 연 10~15% 복리</b>(7~10년에 2~4배)가 현실적이고, 레버리지·몰빵은 오히려 계좌를 날립니다. 부자가 된 사람들의 공통점은 종목이 아니라 <b>"안 팔고 오래 버틴 것"</b>입니다.
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>선정 기준 (5가지 동시 충족 지향)</h2>
+    <div class="crit">
+      1) <b>PER 10배 이하</b> (이익 대비 쌈) · 2) <b>PBR 1배 이하</b> 또는 업종 대비 저평가 · 3) <b>ROE 10% 이상</b>(돈 잘 굴림) · 4) <b>배당 3%+ 또는 자사주 소각</b>(주주환원) · 5) <b>3년 연속 흑자·낮은 부채</b>.<br>
+      <span class="muted">주의: PER·PBR만 낮고 ROE·성장성이 없으면 "가치 함정". 저평가 <b>이유</b>가 일시적 소외인지 구조적 쇠퇴인지 꼭 구분.</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>워치리스트</h2>
+    <p class="muted" style="font-size:12px;margin:0 0 6px">지표는 2026년 기준 <b>대략치(참고용)</b>입니다. 실제 매수 전 최신 수치를 반드시 확인하세요.</p>
+    <div class="tabs">
+      <button data-f="all" class="on">전체</button>
+      <button data-f="kr">국내(밸류업)</button>
+      <button data-f="gl">글로벌</button>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <section class="panel">
+    <h2>장기투자 원칙 (오일전문가 요약)</h2>
+    <ul>
+      <li><b>분산은 5~10종목</b>으로 — 너무 잘게 쪼개면 자산 못 불림, 몰빵은 위험.</li>
+      <li><b>3년 이상 보유</b> 전제 — 저평가가 제 가치로 돌아오는 데 시간이 걸림.</li>
+      <li><b>하락장은 추가매수 기회</b> — 기업 가치가 훼손되지 않았다면.</li>
+      <li><b>이익실현용 매도 자제</b> — 배당 받으며 복리로 굴림. 투자 논리가 깨질 때만 매도.</li>
+      <li><b>배당 재투자</b> + 꾸준한 적립 — 시드보다 습관이 핵심.</li>
+      <li>초보는 <b>배당 ETF(SCHD 등)로 시작</b> 후 개별주로 확장도 방법.</li>
+    </ul>
+  </section>
+
+  <p class="foot">투자 판단 참고용이며 특정 종목 추천·수익 보장이 아닙니다. 지표는 대략치이니 최신 데이터로 확인하세요.</p>
+</div>
+
+<script>
+const STOCKS=[
+  {g:"kr",nm:"하나금융지주",tk:"086790",sec:"금융지주",m:["PER ~5","PBR ~0.5","ROE 10%+","배당 5~7%","자사주 소각"],
+   why:"싱글파이어 핵심 종목. 10년 무적자, 순이익·배당 꾸준 성장. 밸류업(주주환원 확대) 최대 수혜.",risk:"금리 하락·부동산 PF 대손 리스크."},
+  {g:"kr",nm:"KB금융",tk:"105560",sec:"금융지주",m:["PER ~7","PBR ~0.7","ROE 10%+","총주주환원 40% 목표"],
+   why:"국내 밸류업 대표주. 자사주 매입·소각 + 배당으로 주주환원 선진국 은행 수준 지향.",risk:"규제·경기 둔화 시 대손 증가."},
+  {g:"kr",nm:"우리금융지주",tk:"316140",sec:"금융지주",m:["PER ~5","PBR ~0.4","배당 6%+"],
+   why:"저PBR·고배당. 비은행(증권·보험) 확장으로 이익 다변화.",risk:"자본비율·M&A 실행 리스크."},
+  {g:"kr",nm:"삼성화재(우)",tk:"000815",sec:"보험",m:["배당 5%+","업계 1위 자본력","자사주"],
+   why:"손보 1위. 안정적 이익·배당의 방어주. 우선주는 배당수익률 더 높음.",risk:"대형 재해·금리 변동."},
+  {g:"kr",nm:"현대차",tk:"005380",sec:"자동차",m:["PER ~4~5","배당 5%+","자사주 소각","ROE 두 자릿수"],
+   why:"글로벌 완성차 중 최저 PER 수준. 하이브리드로 EV 캐즘 방어, 밸류업 주주환원.",risk:"관세·글로벌 수요 둔화·환율."},
+  {g:"kr",nm:"기아",tk:"000270",sec:"자동차",m:["PER ~4","배당 4%+","고ROE","자사주 소각"],
+   why:"현대차와 유사한 저PER·고ROE·주주환원. 수익성(마진) 업계 최상위권.",risk:"수요 둔화·관세·인센티브 확대."},
+  {g:"kr",nm:"KT&G",tk:"033780",sec:"필수소비재",m:["배당 ~5%","안정 캐시플로우","자사주"],
+   why:"경기 방어·배당 안정(배당귀족 성격). 해외 담배·건기식으로 완만 성장.",risk:"저성장·규제."},
+  {g:"kr",nm:"삼성전자",tk:"005930",sec:"반도체",m:["대장주","HBM4 추격","상대적 저평가"],
+   why:"SK하이닉스 대비 덜 오른 상대 저평가. 세계 최대 메모리 CAPA + HBM4 양산 진입.",risk:"HBM 경쟁열위·파운드리 부진."},
+  {g:"kr",nm:"SK스퀘어",tk:"402340",sec:"지주",m:["NAV 대비 할인","하이닉스 지분","자사주 소각"],
+   why:"보유 자산(SK하이닉스 지분 등) 가치 대비 크게 할인. 자사주 소각으로 할인 축소 시도.",risk:"지주 할인 지속·하이닉스 변동성."},
+  // 글로벌 (분산용 · IB 선호 퀄리티)
+  {g:"gl",nm:"Alphabet (Google)",tk:"GOOGL",sec:"빅테크",m:["빅테크 중 저PER","현금창출","광고·클라우드·AI"],
+   why:"메가캡 중 상대적으로 낮은 밸류에이션 + 강력한 해자. IB 다수 Buy.",risk:"AI 검색 잠식·규제(반독점)."},
+  {g:"gl",nm:"TSMC",tk:"TSM",sec:"반도체 파운드리",m:["AI 독점적 지위","성장 대비 합리적 PER"],
+   why:"AI 칩 위탁생산 사실상 독점. 노무라 언급대로 구조적 성장 대비 밸류 합리적.",risk:"지정학(대만)·capex 부담."},
+  {g:"gl",nm:"Berkshire Hathaway",tk:"BRK.B",sec:"복합기업",m:["퀄리티 컴파운더","현금 방어력"],
+   why:"우량기업 포트폴리오 + 막대한 현금. 하락장 방어·장기 복리의 교과서.",risk:"승계 이슈·저성장 구간."},
+  {g:"gl",nm:"JPMorgan",tk:"JPM",sec:"글로벌 은행",m:["ROE 우수","배당+자사주"],
+   why:"세계 최고 수준 은행. 안정적 자본·주주환원. 금융 섹터 분산용.",risk:"경기침체·대손."},
+  {g:"gl",nm:"배당성장 ETF (SCHD)",tk:"SCHD",sec:"ETF",m:["배당성장","분산","초보 적합"],
+   why:"개별주 고르기 부담되면 시작점. 우량 배당주 100종목 자동 분산.",risk:"개별주 대비 폭발력 낮음·환율."},
+];
+const list=document.getElementById("list");
+function render(f){
+  list.innerHTML=STOCKS.filter(s=>f==="all"||s.g===f).map(s=>`
+    <div class="stock">
+      <div class="top"><div><span class="nm">${s.nm}</span> <span class="tk">${s.tk}</span></div><span class="sec">${s.sec}</span></div>
+      <div class="metrics">${s.m.map(x=>`<span class="metric">${x}</span>`).join("")}</div>
+      <div class="why">${s.why}</div>
+      <div class="risk">⚠ ${s.risk}</div>
+    </div>`).join("");
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("on"));b.classList.add("on");render(b.dataset.f);}));
+render("all");
+</script>
+</body>
+</html>
