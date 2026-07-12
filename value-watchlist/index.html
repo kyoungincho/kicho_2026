@@ -95,7 +95,8 @@
       <div><label style="font-size:11px;color:var(--muted)">시작금액(만원)</label><input id="c_seed" type="number" value="4000" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
       <div><label style="font-size:11px;color:var(--muted)">월 적립(만원)</label><input id="c_mon" type="number" value="50" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
       <div><label style="font-size:11px;color:var(--muted)">연 수익률(%)</label><input id="c_ret" type="number" value="12" step="1" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
-      <div><label style="font-size:11px;color:var(--muted)">기간(년)</label><input id="c_yrs" type="number" value="20" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">기간(년)</label><input id="c_yrs" type="number" value="10" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">목표 금액(억)</label><input id="c_goal" type="number" value="50" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
     </div>
     <div id="c_out" style="margin-top:12px"></div>
   </section>
@@ -188,17 +189,28 @@ function calc(){
   const profit=bal-principal;
   const mult=seed>0?bal/seed:0;
   // 55억(137배)까지 걸리는 개월수
-  const target=550000; let tb=seed,tm=0; while(tb<target&&tm<1200){tb=tb*(1+rm)+mon;tm++;}
-  const tYears=(tm/12).toFixed(0);
+  const goal=(+document.getElementById("c_goal").value||0)*10000; // 억→만원
+  // 목표 역산: (1) 필요 연수익률 (적립 유지) (2) 필요 월적립 (수익률 유지)
+  const fvAt=(R,M)=>{const r=Math.pow(1+R,1/12)-1;let b=seed;for(let i=0;i<n;i++)b=b*(1+r)+M;return b;};
+  let lo=0,hi=3;for(let k=0;k<80;k++){const md=(lo+hi)/2;if(fvAt(md,mon)<goal)lo=md;else hi=md;}
+  const needR=(lo+hi)/2;
+  let ml=0,mh=1000000;for(let k=0;k<80;k++){const md=(ml+mh)/2;if(fvAt(ret,md)<goal)ml=md;else mh=md;}
+  const needM=(ml+mh)/2;
+  const wonMon=(x)=>x>=10000?(x/10000).toFixed(1)+"억":Math.round(x).toLocaleString("ko-KR")+"만원";
+  const hardR = needR>0.30;
   document.getElementById("c_out").innerHTML=`
     <div class="crit">
       ${yrs}년 뒤 예상: <b style="color:var(--green);font-size:16px">${won(bal)}</b>
-      <span class="muted">(원금 ${won(principal)} · 수익 ${won(profit)} · 시작금 대비 ${mult.toFixed(1)}배)</span><br>
-      <span class="muted" style="font-size:12px">이 조건으로 <b>55억(그 사람 수준)</b>까지: ${tm<1200?`약 <b>${tYears}년</b>`:"100년 내 도달 어려움 (수익률·적립을 높여야)"}</span>
+      <span class="muted">(원금 ${won(principal)} · 수익 ${won(profit)} · ${mult.toFixed(1)}배)</span>
     </div>
-    <p class="muted" style="font-size:11.5px;margin-top:8px">※ 배당 재투자·연 수익률을 매년 일정하게 가정한 단순 계산입니다. 실제는 등락이 있고 세금·물가가 반영되지 않았습니다.</p>`;
+    <div class="crit" style="margin-top:10px;border-color:${hardR?'var(--up)':'var(--gold)'}">
+      🎯 목표 <b>${(goal/10000).toFixed(0)}억</b>을 <b>${yrs}년</b>에 달성하려면:<br>
+      • 지금 월적립(${wonMon(mon)}) 유지 시 → <b style="color:${hardR?'var(--up)':'var(--green)'}">연 ${(needR*100).toFixed(0)}% 수익률</b> 필요 ${hardR?'<span class="up">(사실상 레버리지·몰빵 = 파산위험)</span>':''}<br>
+      • 지금 수익률(연 ${(ret*100).toFixed(0)}%) 유지 시 → <b>월 ${wonMon(needM)}</b> 적립 필요
+    </div>
+    <p class="muted" style="font-size:11.5px;margin-top:8px">※ 참고: 워런 버핏 장기 연평균 ~20%. 연 30%+를 10년 지속은 극히 드뭅니다. 단순 복리 가정(세금·물가·등락 제외).</p>`;
 }
-["c_seed","c_mon","c_ret","c_yrs"].forEach(id=>document.getElementById(id).addEventListener("input",calc));
+["c_seed","c_mon","c_ret","c_yrs","c_goal"].forEach(id=>document.getElementById(id).addEventListener("input",calc));
 calc();
 
 // 저평가 점수 계산기
