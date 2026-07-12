@@ -70,6 +70,18 @@
   </section>
 
   <section class="panel">
+    <h2>지금도 유효할까? — 복리 계산기</h2>
+    <p class="muted" style="font-size:12px;margin:0 0 10px">"137배"는 특수 결과. 현실은 <b>연 10~15% 복리 × 오랜 시간</b>. 직접 넣어보세요.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><label style="font-size:11px;color:var(--muted)">시작금액(만원)</label><input id="c_seed" type="number" value="4000" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">월 적립(만원)</label><input id="c_mon" type="number" value="50" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">연 수익률(%)</label><input id="c_ret" type="number" value="12" step="1" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">기간(년)</label><input id="c_yrs" type="number" value="20" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+    </div>
+    <div id="c_out" style="margin-top:12px"></div>
+  </section>
+
+  <section class="panel">
     <h2>5년 들고 가도 될까? — 3가지만 확인</h2>
     <div class="crit">
       1) <b>5년 뒤에도 이 회사가 돈을 잘 벌까?</b> (구조적 쇠퇴가 아닌가)<br>
@@ -141,6 +153,34 @@ function render(f){
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("on"));b.classList.add("on");render(b.dataset.f);}));
 render("all");
+
+// 복리 계산기 (월 적립 + 배당 재투자 가정, 월복리)
+const won=(manwon)=>{const eok=manwon/10000; return eok>=1? eok.toLocaleString("ko-KR",{maximumFractionDigits:2})+"억원" : Math.round(manwon).toLocaleString("ko-KR")+"만원";};
+function calc(){
+  const seed=+document.getElementById("c_seed").value||0;
+  const mon=+document.getElementById("c_mon").value||0;
+  const ret=(+document.getElementById("c_ret").value||0)/100;
+  const yrs=Math.max(0,+document.getElementById("c_yrs").value||0);
+  const rm=Math.pow(1+ret,1/12)-1; // 월 환산 수익률
+  const n=yrs*12;
+  let bal=seed;
+  for(let i=0;i<n;i++){bal=bal*(1+rm)+mon;}
+  const principal=seed+mon*n;
+  const profit=bal-principal;
+  const mult=seed>0?bal/seed:0;
+  // 55억(137배)까지 걸리는 개월수
+  const target=550000; let tb=seed,tm=0; while(tb<target&&tm<1200){tb=tb*(1+rm)+mon;tm++;}
+  const tYears=(tm/12).toFixed(0);
+  document.getElementById("c_out").innerHTML=`
+    <div class="crit">
+      ${yrs}년 뒤 예상: <b style="color:var(--green);font-size:16px">${won(bal)}</b>
+      <span class="muted">(원금 ${won(principal)} · 수익 ${won(profit)} · 시작금 대비 ${mult.toFixed(1)}배)</span><br>
+      <span class="muted" style="font-size:12px">이 조건으로 <b>55억(그 사람 수준)</b>까지: ${tm<1200?`약 <b>${tYears}년</b>`:"100년 내 도달 어려움 (수익률·적립을 높여야)"}</span>
+    </div>
+    <p class="muted" style="font-size:11.5px;margin-top:8px">※ 배당 재투자·연 수익률을 매년 일정하게 가정한 단순 계산입니다. 실제는 등락이 있고 세금·물가가 반영되지 않았습니다.</p>`;
+}
+["c_seed","c_mon","c_ret","c_yrs"].forEach(id=>document.getElementById(id).addEventListener("input",calc));
+calc();
 </script>
 </body>
 </html>
