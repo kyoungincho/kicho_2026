@@ -70,6 +70,25 @@
   </section>
 
   <section class="panel">
+    <h2>저평가, 명확히 계산하기</h2>
+    <p class="muted" style="font-size:12px;margin:0 0 8px">위 리스트 지표는 <b>대략치(참고용)</b>입니다. 아래에 <b>실제 숫자</b>를 넣으면 저평가 여부를 공식으로 계산합니다.</p>
+    <div class="crit" style="margin-bottom:12px">
+      PER=가÷EPS · PBR=가÷BPS · 배당률=배당÷가 · <b>정당PBR=ROE÷요구수익률</b> · <b>적정주가=BPS×정당PBR</b> · <b>안전마진=적정÷현재−1</b><br>
+      <span class="muted">우량 게이트: ROE≥10% · 부채≤100% · 흑자. (미달 시 지표 낮아도 "가치 함정")</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div><label style="font-size:11px;color:var(--muted)">현재가(원)</label><input id="v_price" type="number" value="100000" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">주당순이익 EPS(원)</label><input id="v_eps" type="number" value="15000" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">주당순자산 BPS(원)</label><input id="v_bps" type="number" value="200000" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">ROE(%)</label><input id="v_roe" type="number" value="12" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">주당배당(원)</label><input id="v_div" type="number" value="5000" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">부채비율(%)</label><input id="v_debt" type="number" value="80" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+      <div><label style="font-size:11px;color:var(--muted)">요구수익률(%)</label><input id="v_coe" type="number" value="10" style="width:100%;padding:8px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-size:15px;text-align:right"/></div>
+    </div>
+    <div id="v_out" style="margin-top:12px"></div>
+  </section>
+
+  <section class="panel">
     <h2>지금도 유효할까? — 복리 계산기</h2>
     <p class="muted" style="font-size:12px;margin:0 0 10px">"137배"는 특수 결과. 현실은 <b>연 10~15% 복리 × 오랜 시간</b>. 직접 넣어보세요.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -181,6 +200,51 @@ function calc(){
 }
 ["c_seed","c_mon","c_ret","c_yrs"].forEach(id=>document.getElementById(id).addEventListener("input",calc));
 calc();
+
+// 저평가 점수 계산기
+function valcalc(){
+  const price=+document.getElementById("v_price").value||0;
+  const eps=+document.getElementById("v_eps").value||0;
+  const bps=+document.getElementById("v_bps").value||0;
+  const roe=+document.getElementById("v_roe").value||0;
+  const div=+document.getElementById("v_div").value||0;
+  const debt=+document.getElementById("v_debt").value||0;
+  const coe=+document.getElementById("v_coe").value||10;
+  const per=eps>0?price/eps:null;
+  const pbr=bps>0?price/bps:null;
+  const dy=price>0?div/price*100:0;
+  const fairPbr=coe>0?roe/coe:0;
+  const fairPrice=bps*fairPbr;
+  const margin=price>0?(fairPrice/price-1)*100:0;
+  // 우량 게이트
+  const gate=roe>=10 && debt<=100 && eps>0;
+  // 저평가 게이트 (PER<10, PBR<1, 배당3%+ 중 충족 개수)
+  let cheap=0; if(per!==null&&per<10)cheap++; if(pbr!==null&&pbr<1)cheap++; if(dy>=3)cheap++;
+  let verdict,color;
+  if(!gate && per!==null&&per<10&&pbr!==null&&pbr<1){verdict="⚠ 가치 함정 의심 (싸지만 ROE·재무 미달)";color="var(--gold)";}
+  else if(gate && margin>15){verdict="✅ 저평가 우량주 (안전마진 충분)";color="var(--green)";}
+  else if(gate && margin>0){verdict="◯ 약간 저평가 우량주";color="var(--green)";}
+  else if(gate && margin>-15){verdict="— 적정 수준 (우량하나 싸진 않음)";color="var(--muted)";}
+  else if(margin<=-15){verdict="▲ 고평가 구간";color="var(--up)";}
+  else {verdict="우량 게이트 미달 (ROE·부채·흑자 확인)";color="var(--gold)";}
+  const chip=(ok,t)=>`<span class="metric" style="color:${ok?'var(--green)':'var(--muted)'}">${ok?'✓':'✕'} ${t}</span>`;
+  document.getElementById("v_out").innerHTML=`
+    <div class="crit" style="border-color:${color}">
+      <div style="font-size:15px;font-weight:800;color:${color};margin-bottom:8px">${verdict}</div>
+      <div class="metrics" style="margin:0 0 8px">
+        <span class="metric">PER <b>${per!==null?per.toFixed(1)+'배':'–'}</b></span>
+        <span class="metric">PBR <b>${pbr!==null?pbr.toFixed(2)+'배':'–'}</b></span>
+        <span class="metric">배당률 <b>${dy.toFixed(1)}%</b></span>
+        <span class="metric">정당PBR <b>${fairPbr.toFixed(2)}배</b></span>
+      </div>
+      적정주가 <b>${Math.round(fairPrice).toLocaleString("ko-KR")}원</b> · 안전마진 <b style="color:${margin>=0?'var(--green)':'var(--up)'}">${margin>=0?'+':''}${margin.toFixed(0)}%</b><br>
+      <div style="margin-top:8px">우량 게이트: ${chip(roe>=10,'ROE≥10%')} ${chip(debt<=100,'부채≤100%')} ${chip(eps>0,'흑자')}</div>
+      <div style="margin-top:4px">저평가 게이트: ${chip(per!==null&&per<10,'PER<10')} ${chip(pbr!==null&&pbr<1,'PBR<1')} ${chip(dy>=3,'배당≥3%')} <span class="muted" style="font-size:11px">(${cheap}/3)</span></div>
+    </div>
+    <p class="muted" style="font-size:11.5px;margin-top:8px">※ 정당PBR=ROE÷요구수익률은 단순화한 벤치마크(성장·배당성향 미세조정 제외). 실제 수치는 네이버금융·각 사 IR에서 확인하세요.</p>`;
+}
+["v_price","v_eps","v_bps","v_roe","v_div","v_debt","v_coe"].forEach(id=>document.getElementById(id).addEventListener("input",valcalc));
+valcalc();
 </script>
 </body>
 </html>
