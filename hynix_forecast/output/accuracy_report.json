@@ -1,0 +1,140 @@
+{
+  "asof": "2026-07-17",
+  "last_close": 1842000.0,
+  "drawdown_from_ath": -0.33357452966714907,
+  "atr_pct": 21.3936714751047,
+  "n_weeks": 24,
+  "scenario_probs": {
+    "bear": 0.25,
+    "base": 0.5,
+    "bull": 0.25
+  },
+  "model_weights": {
+    "factor": 0.23998548859191784,
+    "bootstrap": 0.24695041023089784,
+    "anchor": 0.025979980326217636,
+    "recovery": 0.2391647634800163,
+    "gbm": 0.2479193573709504
+  },
+  "calibration": {
+    "scale80": 0.8789473684210527,
+    "scale50": 1.0,
+    "abs_err_p80": 0.25353304906655144
+  },
+  "accuracy": {
+    "h4_full": {
+      "mape": 0.11007252819319668,
+      "rmse": 0.14928809461559106,
+      "smape": 0.11101731606878662,
+      "dir_acc": 0.717948717948718,
+      "cover80": 0.8589743589743589,
+      "cover50": 0.6923076923076923,
+      "n": 78
+    },
+    "h8_full": {
+      "mape": 0.1522578048726173,
+      "rmse": 0.1981136961736823,
+      "smape": 0.16371745876598315,
+      "dir_acc": 0.7763157894736842,
+      "cover80": 0.9210526315789473,
+      "cover50": 0.6052631578947368,
+      "n": 76
+    },
+    "h4_recent": {
+      "mape": 0.1492603615152523,
+      "rmse": 0.18784789239048158,
+      "smape": 0.15917188980588876,
+      "dir_acc": 0.8333333333333334,
+      "cover80": 0.8518518518518519,
+      "cover50": 0.5370370370370371,
+      "n": 54
+    },
+    "h8_recent": {
+      "mape": 0.22011069255828164,
+      "rmse": 0.26730716780523267,
+      "smape": 0.26061794567244784,
+      "dir_acc": 0.92,
+      "cover80": 0.94,
+      "cover50": 0.48,
+      "n": 50
+    }
+  },
+  "december": {
+    "q10": 1001707.310717751,
+    "q50": 2424989.8989898995,
+    "q90": 3848272.487262048,
+    "bear": 1842400.0544080504,
+    "base": 2281229.792147805,
+    "bull": 3180045.824266794
+  },
+  "milestones": {
+    "cost": {
+      "by_end_Aug": 0.2376,
+      "by_end_Oct": 0.4384,
+      "by_end_Dec": 0.5896,
+      "ever_by_Dec": 0.7168
+    },
+    "238": {
+      "by_end_Aug": 0.1624,
+      "by_end_Oct": 0.3608,
+      "by_end_Dec": 0.5264,
+      "ever_by_Dec": 0.65
+    },
+    "261": {
+      "by_end_Aug": 0.0904,
+      "by_end_Oct": 0.2644,
+      "by_end_Dec": 0.3788,
+      "ever_by_Dec": 0.5172
+    },
+    "350": {
+      "by_end_Aug": 0.0176,
+      "by_end_Oct": 0.1116,
+      "by_end_Dec": 0.2044,
+      "ever_by_Dec": 0.2632
+    },
+    "400": {
+      "by_end_Aug": 0.0076,
+      "by_end_Oct": 0.0656,
+      "by_end_Dec": 0.1512,
+      "ever_by_Dec": 0.1936
+    }
+  },
+  "position": {
+    "shares": 42,
+    "avg_cost": 2264880,
+    "core": 33,
+    "ammo": 9,
+    "monthly_interest": 900000,
+    "sell_ladder": [
+      2380000,
+      2450000,
+      2610000
+    ],
+    "rebuy": {
+      "drops": [
+        0.12,
+        0.18,
+        0.25
+      ],
+      "fracs": [
+        0.4,
+        0.4,
+        0.2
+      ]
+    },
+    "core_ladder": [
+      3500000,
+      3750000,
+      4000000
+    ]
+  },
+  "improvements": [
+    "recovery bootstrap conditioned on DD<=-25%",
+    "tilt bootstrap after deep drawdown",
+    "explicit bear/base/bull scenarios with DD/ATR priors",
+    "55/45 blend of scenario paths and accuracy-weighted statistical models",
+    "recent-1y walk-forward weighting",
+    "interval calibration from coverage gap",
+    "week-level trigger probabilities from full path distribution"
+  ]
+}
