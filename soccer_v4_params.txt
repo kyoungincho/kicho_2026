@@ -1,0 +1,8 @@
+N0=60
+LAM=3.0
+RAIL=0.2
+EV_FLOOR=0.10
+P_DRAW_NOGAP=0.3199
+tier	0.2965
+notier	-0.2841
+away	0.0687
